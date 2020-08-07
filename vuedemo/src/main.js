@@ -8,6 +8,7 @@ import VueParticles from 'vue-particles'
 import '../src/assets/css/headbg.css'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
+import 'element-ui/lib/theme-chalk/base.css';
 
 Vue.config.productionTip = false
 Vue.prototype.$echarts = echarts

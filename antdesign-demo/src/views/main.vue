@@ -21,7 +21,7 @@
             </a-menu>
         </a-layout-sider>
         <a-layout>
-            <a-layout-header   class="headbg" >
+            <a-layout-header :style="{position: 'fixed', zIndex: 1, width: '100%' }"   class="headbg" >
                 <a-icon
                         class="trigger"
                         :type="collapsed ? 'menu-unfold' : 'menu-fold'"
@@ -29,8 +29,8 @@
 
                 />
 
-                <div style="float:right;">
-                    <a-badge dot style="margin: 10px 15px 10px">
+                <div style="position: fixed;z-index: 0;right: 5%;top:0">
+                    <a-badge dot style="margin: 10px 15px 10px;" >
                         <a-icon
                                 style="color:#FFFFFF;font-size: 18px;"
                                 type="bell"
@@ -72,9 +72,12 @@
                 </a-modal>
 
             </a-layout-header>
+          <div class="headbg jm"></div>
             <a-layout-content
-                    :style="{ margin: '24px 16px', padding: '24px', minHeight: '600px' }"
+                :style="{ padding: '24px', marginTop: '80px', minHeight: '600px'}"
+
             >
+              <!--:style="{ margin: '24px 16px', padding: '24px', minHeight: '600px' }"-->
 
                 <router-view></router-view>
             </a-layout-content>
@@ -167,5 +170,17 @@
         height: 32px;
         background: rgba(255, 255, 255, 0.2);
         margin: 16px;
+    }
+    .jm{
+      top: 64px;
+      /*left: 200px;*/
+      padding: 0px;
+      width: 100%;
+      height: 100px;
+      position: fixed;
+
+      /*background: linear-gradient(to right, rgba(22, 182, 255, 0.97),
+      rgba(181,31,255,0.88));*/
+      /*background-color: #673AB7;*/
     }
 </style>

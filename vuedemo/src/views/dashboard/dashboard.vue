@@ -1,5 +1,7 @@
 <template>
-    <div>
+  <transition name="el-fade-in">
+
+    <div v-show="show">
         <el-row :gutter="20" style="margin-bottom: 10px;">
             <el-col  :xs="24" :sm="12" :md="6" >
                 <el-card  :body-style="{height:'70px'}">
@@ -100,6 +102,7 @@
             </el-col>
         </el-row>
     </div>
+  </transition>
 </template>
 <script>
     import echarts from '../charts/echarts'
@@ -112,7 +115,15 @@
             echarts,
             waitcheck,
             message
+        },
+      data(){
+        return{
+          show:true
         }
+      },
+      mounted() {
+          this.show=true
+      }
 
     }
 </script>
