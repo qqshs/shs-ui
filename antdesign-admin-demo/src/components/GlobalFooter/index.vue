@@ -1,12 +1,10 @@
 <template>
   <global-footer class="footer custom-render">
-    <template v-slot:links>
-      <a href="https://www.github.com/vueComponent/pro-layout" target="_blank">Pro Layout</a>
-      <a href="https://www.github.com/vueComponent/ant-design-vue-pro" target="_blank">Github</a>
-      <a href="https://www.github.com/sendya/" target="_blank">@Sendya</a>
-    </template>
     <template v-slot:copyright>
-      <a href="https://github.com/vueComponent" target="_blank">vueComponent</a>
+      <a href="http://www.bytter.com" target="_blank">COPYRIGHT (©) 2020 bytter拜特.</a>
+    </template>
+    <template v-slot:links>
+      <a href="http://www.beian.miit.gov.cn/" target="_blank">粤ICP备05105073号-1</a>
     </template>
   </global-footer>
 </template>

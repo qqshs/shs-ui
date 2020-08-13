@@ -78,7 +78,8 @@
           <a-tab-pane loading="true" tab="销售额" key="1">
             <a-row>
               <a-col :xl="16" :lg="12" :md="12" :sm="24" :xs="24">
-                <bar :data="barData" title="销售额排行" />
+                <!--<bar :data="barData" title="销售额排行" />-->
+                <pay-for-month title="销售额排行"></pay-for-month>
               </a-col>
               <a-col :xl="8" :lg="12" :md="12" :sm="24" :xs="24">
                 <rank-list title="门店销售排行榜" :list="rankList"/>
@@ -225,7 +226,7 @@ import {
   MiniSmoothArea
 } from '@/components'
 import { baseMixin } from '@/store/app-mixin'
-
+import payForMonth from './payForMonth'
 const barData = []
 const barData2 = []
 for (let i = 0; i < 12; i += 1) {
@@ -337,7 +338,8 @@ export default {
     Bar,
     Trend,
     NumberInfo,
-    MiniSmoothArea
+    MiniSmoothArea,
+    payForMonth
   },
   data () {
     return {

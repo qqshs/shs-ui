@@ -13,6 +13,7 @@
   "dependencies": {
     "@ant-design-vue/pro-layout": "^0.3.4",
     "@antv/data-set": "^0.10.2",
+    "@antv/g2plot": "^1.1.23",
     "ant-design-vue": "^1.6.2",
     "axios": "^0.19.0",
     "core-js": "^3.1.2",

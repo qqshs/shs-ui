@@ -45,6 +45,28 @@ export const asyncRouterMap = [
         ]
       },
 
+      //customer
+      {
+        path:'/customer',
+        redirect: '/customer/customer-registered',
+        component: RouteView,
+        meta: {title: '商户平台',icon: 'team', permission: ['customer']},
+        children: [
+          {
+            path: '/customer/customer-registered',
+            name: 'CustomerRegistered',
+            meta: { title: '商户注册', keepAlive: true, permission: [ 'customer' ] },
+            component: ()=> import('@/views/customer/customerRegistered')
+          },
+          {
+            path: '/customer/customer-details',
+            name: 'CustomerDetails',
+            meta: {title: '商户详情', keepAlive: true, permission: ['customer']},
+            component: ()=> import('@/views/customer/CustomerDetails')
+          }
+        ]
+      },
+
       // forms
       {
         path: '/form',
