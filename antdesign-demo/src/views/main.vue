@@ -72,7 +72,7 @@
                 </a-modal>
 
             </a-layout-header>
-          <div class="headbg jm"></div>
+          <!--<div class="headbg jm"></div>-->
             <a-layout-content
                 :style="{ padding: '24px', marginTop: '80px', minHeight: '600px'}"
 

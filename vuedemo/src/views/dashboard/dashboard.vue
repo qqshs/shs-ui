@@ -4,8 +4,8 @@
     <div v-show="show">
         <el-row :gutter="20" style="margin-bottom: 10px;">
             <el-col  :xs="24" :sm="12" :md="6" >
-                <el-card  :body-style="{height:'70px'}">
-                    <el-row>
+                <el-card  :body-style="{height:'70px'}" >
+                    <el-row class="headbg">
                         <el-col :span="12">
                             <i class="el-icon-s-goods" style="font-size:60px;color:#0591FC"></i>
                         </el-col>

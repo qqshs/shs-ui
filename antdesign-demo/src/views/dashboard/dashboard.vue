@@ -2,15 +2,19 @@
   <div>
     <a-row :gutter="[10,10]">
       <a-col :xs="24" :md="12" :lg="6">
-        <a-card :bordered="true" hoverable :loading="loading">
+        <a-card :bordered="true" hoverable :loading="loading"
+                :head-style="{color:'#FFFFFF'}"
+                :body-style="{color:'#FFFFFF'}"
+                class="cards">
           <a-statistic
             title="当日销售额"
             :value="daySaleCount"
             :precision="2"
-            style="margin-right: 50px"
+            :value-style="{color:'#ffffff'}"
+            style="margin-right: 50px;"
           ></a-statistic>
           <a-divider style="margin: 10px 0px 5px"></a-divider>
-          <span>环比增长：1% 同比增长：2.4%</span>
+          <span style="color:#ffffff">环比增长：1% 同比增长：2.4%</span>
         </a-card>
       </a-col>
       <a-col :xs="24" :md="12" :lg="6">
@@ -21,7 +25,7 @@
         </a-card>
       </a-col>
       <a-col :xs="24" :md="12" :lg="6">
-        <a-card :bordered="true" hoverable :loading="loading">
+        <a-card :bordered="true" hoverable :loading="loading" :body-style="{color:'#FFFFFF'}" class="headbg">
           <a-statistic title="当日归集总额" :value="5871000" :precision="2" style="margin-right: 50px"></a-statistic>
           <a-divider style="margin: 10px 0px 5px"></a-divider>
           <span>环比增长：4.5% 同比增长：0.9%</span>
@@ -86,4 +90,8 @@ export default {
 </script>
 
 <style scoped>
+.cards{
+  background: linear-gradient(to right, rgba(17,197,239),
+  rgba(17,119,239,1));
+}
 </style>
