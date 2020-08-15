@@ -66,7 +66,27 @@ export const asyncRouterMap = [
           }
         ]
       },
-
+      //commissionAcc
+      {
+        path: '/commission-acc',
+        redirect: '/commission-acc/acc-info',
+        component: RouteView,
+        meta: {title: '酬金账户平台',icon: 'bank', permission: ['commission-acc']},
+        children: [
+          {
+            path: '/commission-acc/acc-info',
+            name: 'CommissionAccInfo',
+            meta: {title: '酬金账户详情', keepAlive: true, permission: ['commission-acc']},
+            component: ()=> import('@/views/commissionAcc/AccInfo')
+          },
+          {
+            path: '/commission-acc/acc-bal',
+            name: 'CommissionAccBal',
+            meta: {title: '酬金账户充值查询',keepAlive: true,permission: ['commission-acc']},
+            component: ()=> import('@/views/commissionAcc/AccBal')
+          }
+        ]
+      },
       // forms
       {
         path: '/form',
