@@ -1,12 +1,22 @@
 <template>
   <page-header-wrapper :title="false">
-    <a-card :bordered="false" title="酬金账户充值查询">
+    <a-card :bordered="false" title="酬金账户交易流水查询">
       <div class="table-page-search-wrapper">
         <a-form layout="inline">
           <a-row :gutter="48">
             <a-col :md="8" :sm="24">
-              <a-form-item label="充值日期">
-                <a-range-picker v-model="searchDate" />
+              <a-form-item label="交易日期">
+                <a-range-picker v-model="searchDate"/>
+              </a-form-item>
+            </a-col>
+            <a-col :md="8" :sm="24">
+              <a-form-item label="收方账户名">
+                <a-input v-model="reciveAccName"></a-input>
+              </a-form-item>
+            </a-col>
+            <a-col :md="8" :sm="24">
+              <a-form-item label="收方账号">
+                <a-input v-model="reciveAccNo"></a-input>
               </a-form-item>
             </a-col>
           </a-row>
@@ -18,6 +28,7 @@
         </a-form>
       </div>
     </a-card>
+  
     <a-card :bordered="false" :loading="loading">
       <div class="table-operator">
         <a-table :columns="columns" :bordered="true" :data-source="data" :pagination="true"></a-table>
@@ -34,75 +45,73 @@ const columns = [
     key: 'date',
   },
   {
-    title: '充值金额',
+    title: '收方户名',
+    dataIndex: 'reciveBankAccName',
+    key: 'reciveBankAccName',
+  },
+  {
+    title: '收方账号',
+    dataIndex: 'reciveBankAcc',
+    key: 'reciveBankAcc',
+  },
+  {
+    title: '交易金额',
     dataIndex: 'money',
     key: 'money',
+    align:'right'
   },
 ]
 const data = [
   {
     key: '1',
     date: '2020-08-14 15:37:02',
+    reciveBankAccName:'杰克马',
+    reciveBankAcc:'95588804000910015',
     money: 178267.88,
   },
   {
     key: '2',
     date: '2020-08-14 09:41:35',
+    reciveBankAccName:'小马哥',
+    reciveBankAcc:'43909777910001881',
     money: 19000.0,
   },
   {
     key: '3',
     date: '2020-08-13 17:33:12',
+    reciveBankAccName:'杰克马',
+    reciveBankAcc:'95588804000910015',
     money: 29081.56,
   },
   {
     key: '4',
     date: '2020-08-13 16:00:01',
+    reciveBankAccName:'小马哥',
+    reciveBankAcc:'43909777910001881',
     money: 3000.0,
   },
   {
     key: '5',
     date: '2020-08-13 13:45:56',
+    reciveBankAccName:'小马哥',
+    reciveBankAcc:'43909777910001881',
     money: 9800.0,
-  },
-  /*{
-      key: '1',
-      month: '五月',
-      saleCount: 178267.88
-  },*/
-  /*{
-      key: '1',
-      month: '六月',
-      saleCount: 178267.88
-  },
-  {
-      key: '1',
-      month: '七月',
-      saleCount: 178267.88
-  }*/
+  }
 ]
 export default {
-  name: 'AccBal',
+  name: 'AccDtl',
   data() {
     return {
       searchDate: [],
+      reciveAccName: '',
+      reciveAccNo: '',
       columns,
-      data,
-      loading: true,
+      data
     }
-  },
-  mounted() {
-    this.loadAll() //模拟从后台获取数据后，显示数据，隐藏骨架屏
-  },
-  methods: {
-    loadAll() {
-      //加载完数据后，隐藏骨架屏
-
-      this.loading = false
-    },
-  },
+  }
 }
 </script>
 
 <style scoped>
+
 </style>

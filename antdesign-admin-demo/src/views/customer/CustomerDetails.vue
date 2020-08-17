@@ -7,7 +7,7 @@
         <a-descriptions-item label="充值账户名称">远洋进出口贸易有限公司</a-descriptions-item>
         <a-descriptions-item label="充值账户账号">9877691099010001</a-descriptions-item>
       </a-descriptions>
-      <a-divider style="margin-bottom: 32px"/>
+      <a-divider style="margin-bottom: 32px" />
       <a-descriptions title="管理员信息">
         <a-descriptions-item label="管理员姓名">杰克马</a-descriptions-item>
         <a-descriptions-item label="管理员手机号">13800138000</a-descriptions-item>
@@ -46,17 +46,10 @@
         <a-descriptions-item label="未付金额">18,923.98</a-descriptions-item>
         <a-descriptions-item label="最后充值日期">2020-08-13 16:30</a-descriptions-item>
       </a-descriptions>
-      <a-divider style="margin-bottom: 32px"/>
+      <a-divider style="margin-bottom: 32px" />
       <a-descriptions title="平台账户充值记录"></a-descriptions>
-      <a-table
-        :columns="columns"
-        :data-source="data"
-        :pagination="false"
-      >
-
-      </a-table>
+      <a-table :columns="columns" :data-source="data" :pagination="false"></a-table>
     </a-card>
-
   </page-header-wrapper>
 </template>
 
@@ -65,41 +58,39 @@ const columns = [
   {
     title: '日期',
     dataIndex: 'date',
-    key: 'date'
-
+    key: 'date',
   },
   {
     title: '充值金额',
     dataIndex: 'money',
-    key: 'money'
-
-  }
+    key: 'money',
+  },
 ]
 const data = [
   {
     key: '1',
     date: '2020-08-14 15:37:02',
-    money: 178267.88
+    money: 178267.88,
   },
   {
     key: '2',
     date: '2020-08-14 09:41:35',
-    money: 19000.00
+    money: 19000.0,
   },
   {
     key: '3',
     date: '2020-08-13 17:33:12',
-    money: 29081.56
+    money: 29081.56,
   },
   {
     key: '4',
     date: '2020-08-13 16:00:01',
-    money: 3000.00
+    money: 3000.0,
   },
   {
     key: '5',
     date: '2020-08-13 13:45:56',
-    money: 9800.00
+    money: 9800.0,
   },
   /*{
       key: '1',
@@ -119,15 +110,16 @@ const data = [
 ]
 export default {
   name: 'CustomerDetails',
-  data(){
-    return{
+  data() {
+    return {
       columns,
-      data
+      data,
     }
-  }
+  },
+  methods: {},
+  mounted() {},
 }
 </script>
 
 <style scoped>
-
 </style>

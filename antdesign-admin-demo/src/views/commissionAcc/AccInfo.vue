@@ -6,7 +6,13 @@
         <a-descriptions-item label="充值账户名称">远洋进出口贸易有限公司</a-descriptions-item>
         <a-descriptions-item label="充值账户账号">9877691099010001</a-descriptions-item>
         <a-descriptions-item label="账户余额">
-          500,908.98 <a-icon type="reload" style="margin-left: 8px"/>
+          500,908.98
+          <a-tooltip placement="right">
+            <template slot="title" >
+              刷新余额
+            </template>
+            <a-icon type="reload" style="margin-left: 8px"/>
+          </a-tooltip>
         </a-descriptions-item>
       </a-descriptions>
     </a-card>

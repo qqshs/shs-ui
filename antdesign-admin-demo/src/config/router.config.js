@@ -41,6 +41,12 @@ export const asyncRouterMap = [
             name: 'Workplace',
             component: () => import('@/views/dashboard/Workplace'),
             meta: { title: 'menu.dashboard.workplace', keepAlive: true, permission: [ 'dashboard' ] }
+          },
+          {
+            path: '/dashboard/pay-info',
+            name: 'PayInfo',
+            component: ()=> import('@/views/dashboard/Dashboard'),
+            meta: {title: '主页',keepAlive: true,permission: ['dashboard']}
           }
         ]
       },
@@ -84,6 +90,12 @@ export const asyncRouterMap = [
             name: 'CommissionAccBal',
             meta: {title: '酬金账户充值查询',keepAlive: true,permission: ['commission-acc']},
             component: ()=> import('@/views/commissionAcc/AccBal')
+          },
+          {
+            path: '/commission-acc/acc-dtl',
+            name: 'CommissionAccDtl',
+            meta: {title: '酬金账户交易流水查询',keepAlive: true,permission: ['commission-acc']},
+            component: ()=> import('@/views/commissionAcc/AccDtl')
           }
         ]
       },
