@@ -4,8 +4,6 @@
       <div id="chartBal"></div>
     </div>
   </div>
-  <!--<div id="canvas"></div>-->
-  
 </template>
 
 <script>
@@ -38,6 +36,11 @@ export default {
         yField: 'value',
         height: 55,
         width: 200,
+        meta:{
+          value:{
+            alias:'充值金额'
+          }
+        },
         
         xAxis:{
           visible: false,

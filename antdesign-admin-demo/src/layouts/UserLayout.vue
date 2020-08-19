@@ -4,25 +4,25 @@
       <div class="top">
         <div class="header">
           <a href="/">
-            <img src="~@/assets/logo.svg" class="logo" alt="logo">
-            <span class="title">Ant Design</span>
+            <img src="~@/assets/bytter.svg" class="logo" alt="logo">
+            <span class="title">酬金代发平台</span>
           </a>
         </div>
         <div class="desc">
-          Ant Design 是西湖区最具影响力的 Web 设计规范
+        
         </div>
       </div>
 
       <router-view />
 
       <div class="footer">
-        <div class="links">
+        <!--<div class="links">
           <a href="_self">帮助</a>
           <a href="_self">隐私</a>
           <a href="_self">条款</a>
-        </div>
+        </div>-->
         <div class="copyright">
-          Copyright &copy; 2018 vueComponent
+          Copyright &copy; 2020 深圳市拜特科技股份有限公司
         </div>
       </div>
     </div>

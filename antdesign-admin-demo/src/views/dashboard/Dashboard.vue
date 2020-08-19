@@ -2,7 +2,7 @@
   <div>
     <a-row :gutter="24">
       <a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">
-        <chart-card  title="账户余额" total="￥126,560">
+        <chart-card :loading="loading"  title="账户余额" total="￥126,560">
           <a-tooltip title="指标说明" slot="action">
             <a-icon type="info-circle-o" />
           </a-tooltip>
@@ -13,7 +13,7 @@
         </chart-card>
       </a-col>
       <a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">
-        <chart-card  title="未支付总额" total="￥367,120">
+        <chart-card :loading="loading"  title="未支付总额" total="￥367,120">
           <a-tooltip title="指标说明" slot="action">
             <a-icon type="info-circle-o" />
           </a-tooltip>
@@ -24,7 +24,7 @@
         </chart-card>
       </a-col>
       <a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">
-        <chart-card  title="注册用户数" total="5,800">
+        <chart-card :loading="loading"  title="注册用户数" total="5,800">
           <a-tooltip title="指标说明" slot="action">
             <a-icon type="info-circle-o" />
           </a-tooltip>
@@ -35,7 +35,7 @@
         </chart-card>
       </a-col>
       <a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">
-        <chart-card  title="已支付总额" total="￥789,980">
+        <chart-card :loading="loading"  title="已支付总额" total="￥789,980">
           <a-tooltip title="指标说明" slot="action">
             <a-icon type="info-circle-o" />
           </a-tooltip>
@@ -46,6 +46,9 @@
         </chart-card>
       </a-col>
     </a-row>
+    <a-card :loading="loading" :bordered="false">
+      <chart-pay-for-day></chart-pay-for-day>
+    </a-card>
   </div>
 </template>
 
@@ -53,13 +56,23 @@
 import {ChartCard,Trend} from '@/components'
 import MiniChartBal from './charts/MiniChartBal'
 import MiniChartPay from './charts/MiniChartPay'
+import ChartPayForDay from './charts/ChartPayForDay'
 export default {
   name: 'Dashboard',
   components:{
     ChartCard,
     Trend,
     MiniChartBal,
-    MiniChartPay
+    MiniChartPay,
+    ChartPayForDay
+  },
+  data(){
+    return{
+      loading: true
+    }
+  },
+  created() {
+    this.loading = !this.loading
   }
 }
 </script>

@@ -32,7 +32,7 @@ import { asyncRouterMap } from '@/config/router.config.js'
 import defaultSettings from '@/config/defaultSettings'
 import RightContent from '@/components/GlobalHeader/RightContent'
 import GlobalFooter from '@/components/GlobalFooter'
-import LogoSvg from '../assets/logo.svg?inline'
+import LogoSvg from '../assets/bytter.svg?inline'
 
 export default {
   name: 'BasicLayout',
