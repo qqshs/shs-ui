@@ -19,19 +19,19 @@ const constantRouterComponents = {
   'Analysis': () => import('@/views/dashboard/Analysis'),
 
   // form
-  'BasicForm': () => import('@/views/form/BasicForm'),
+  // 'BasicForm': () => import('@/views/form/BasicForm'),
   'StepForm': () => import('@/views/form/stepForm/StepForm'),
   'AdvanceForm': () => import('@/views/form/advancedForm/AdvancedForm'),
 
   // list
   'TableList': () => import('@/views/list/TableList'),
-  'StandardList': () => import('@/views/list/StandardList'),
+  // 'StandardList': () => import('@/views/list/StandardList'),
   'CardList': () => import('@/views/list/CardList'),
   'SearchLayout': () => import('@/views/list/search/SearchLayout'),
   'SearchArticles': () => import('@/views/list/search/Article'),
   'SearchProjects': () => import('@/views/list/search/Projects'),
   'SearchApplications': () => import('@/views/list/search/Applications'),
-  'ProfileBasic': () => import('@/views/profile/basic/Index'),
+  // 'ProfileBasic': () => import('@/views/profile/basic/Index'),
   'ProfileAdvanced': () => import('@/views/profile/advanced/Advanced'),
 
   // result
@@ -44,7 +44,7 @@ const constantRouterComponents = {
   'Exception500': () => import(/* webpackChunkName: "fail" */ '@/views/exception/500'),
 
   // account
-  'AccountCenter': () => import('@/views/account/center/Index'),
+  // 'AccountCenter': () => import('@/views/account/center/Index'),
   'AccountSettings': () => import('@/views/account/settings/Index'),
   'BaseSettings': () => import('@/views/account/settings/BaseSetting'),
   'SecuritySettings': () => import('@/views/account/settings/Security'),
@@ -78,9 +78,9 @@ const rootRouter = {
  * @param token
  * @returns {Promise<Router>}
  */
-export const generatorDynamicRouter = (token) => {
+export const generatorDynamicRouter = () => {
   return new Promise((resolve, reject) => {
-    loginService.getCurrentUserNav(token).then(res => {
+    loginService.getCurrentUserNav().then(res => {
       console.log('res', res)
       const { result } = res
       const menuNav = []

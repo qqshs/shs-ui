@@ -2,16 +2,16 @@
   <page-header-wrapper :title="false">
     <a-card :bordered="false" title="商户详情">
       <a-descriptions title="商户信息">
-        <a-descriptions-item label="商户名称">远洋进出口贸易有限公司</a-descriptions-item>
-        <a-descriptions-item label="统一社会信用代码">989983778291982</a-descriptions-item>
-        <a-descriptions-item label="充值账户名称">远洋进出口贸易有限公司</a-descriptions-item>
-        <a-descriptions-item label="充值账户账号">9877691099010001</a-descriptions-item>
+        <a-descriptions-item label="商户名称">{{customer.customerName}}</a-descriptions-item>
+        <a-descriptions-item label="统一社会信用代码">{{customer.socialCreditCode}}</a-descriptions-item>
+        <a-descriptions-item label="充值账户名称">{{customer.accountName}}</a-descriptions-item>
+        <a-descriptions-item label="充值账户账号">{{customer.accountCode}}</a-descriptions-item>
       </a-descriptions>
       <a-divider style="margin-bottom: 32px" />
       <a-descriptions title="管理员信息">
-        <a-descriptions-item label="管理员姓名">杰克马</a-descriptions-item>
-        <a-descriptions-item label="管理员手机号">13800138000</a-descriptions-item>
-        <a-descriptions-item label="管理员邮箱">jdm@bytter.com</a-descriptions-item>
+        <a-descriptions-item label="管理员姓名">{{customer.adminName}}</a-descriptions-item>
+        <a-descriptions-item label="管理员手机号">{{customer.adminPhone}}</a-descriptions-item>
+        <a-descriptions-item label="管理员邮箱">{{customer.adminMail}}</a-descriptions-item>
       </a-descriptions>
     </a-card>
 
@@ -23,7 +23,7 @@
           </template>
           <template v-slot:description>
             <div class="antd-pro-pages-profile-advanced-style-stepDescription">
-              <div>2020-08-10 12:32</div>
+              <div>{{customer.createTime}}</div>
             </div>
           </template>
         </a-step>
@@ -33,7 +33,7 @@
           </template>
           <template v-slot:description>
             <div class="antd-pro-pages-profile-advanced-style-stepDescription">
-              <div>2020-08-10 17:10</div>
+              <div>{{customer.updateTime}}</div>
             </div>
           </template>
         </a-step>
@@ -92,26 +92,23 @@ const data = [
     date: '2020-08-13 13:45:56',
     money: 9800.0,
   },
-  /*{
-      key: '1',
-      month: '五月',
-      saleCount: 178267.88
-  },*/
-  /*{
-      key: '1',
-      month: '六月',
-      saleCount: 178267.88
-  },
-  {
-      key: '1',
-      month: '七月',
-      saleCount: 178267.88
-  }*/
 ]
 export default {
   name: 'CustomerDetails',
   data() {
     return {
+      customer: {
+        customerName: '',
+        socialCreditCode: '',
+        accountName: '',
+        accountCode: '',
+        adminName: '',
+        adminPhone: '',
+        adminMail: '',
+        createTime: '',
+        updateTime: '',
+        status: ''
+      },
       columns,
       data,
     }

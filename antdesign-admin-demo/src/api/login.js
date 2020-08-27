@@ -1,8 +1,8 @@
 import request from '@/utils/request'
 
 const userApi = {
-  Login: '/auth/login',
-  Logout: '/auth/logout',
+  Login: '/businessBasic/userLogin/login_login',
+  Logout: '/businessBasic/userLogin/login_logout',
   ForgePassword: '/auth/forge-password',
   Register: '/auth/register',
   twoStepCode: '/auth/2step-code',
@@ -25,6 +25,7 @@ const userApi = {
  * @returns {*}
  */
 export function login (parameter) {
+  
   return request({
     url: userApi.Login,
     method: 'post',
@@ -53,17 +54,21 @@ export function getInfo () {
 export function getCurrentUserNav () {
   return request({
     url: userApi.UserMenu,
-    method: 'get'
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json;charset=UTF-8'
+    }
   })
 }
 
-export function logout () {
+export function logout (data) {
   return request({
     url: userApi.Logout,
     method: 'post',
     headers: {
       'Content-Type': 'application/json;charset=UTF-8'
-    }
+    },
+    data
   })
 }
 

@@ -14,6 +14,7 @@ const request = axios.create({
 
 // 异常拦截处理器
 const errorHandler = (error) => {
+
   if (error.response) {
     const data = error.response.data
     // 从 localstorage 获取 token
@@ -43,6 +44,11 @@ const errorHandler = (error) => {
 
 // request interceptor
 request.interceptors.request.use(config => {
+  const tempRequest = ['/auth/login', '/user/nav', '/auth/logout']
+  // console.warn('以下接口 临时走前端服务,如需调试移除后保存即可 无需重启. \n', tempRequest.join('\n'))
+  if (tempRequest.includes(config.url)) {
+    config.baseURL = '/local'
+  }
   const token = storage.get(ACCESS_TOKEN)
   // 如果 token 存在
   // 让每个请求携带自定义 token 请根据实际情况自行修改
@@ -54,12 +60,13 @@ request.interceptors.request.use(config => {
 
 // response interceptor
 request.interceptors.response.use((response) => {
+  
   return response.data
 }, errorHandler)
 
 const installer = {
   vm: {},
-  install (Vue) {
+  install(Vue) {
     Vue.use(VueAxios, request)
   }
 }
