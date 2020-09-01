@@ -8,11 +8,12 @@
           :wrapperCol="{lg: {span: 10}, sm: {span: 17} }">
           <a-input
             v-decorator="[
-              'name',
+              'customerName',
               {rules: [{ required: true, message: '请输入商户名称' }]}
             ]"
-            name="name"
-            placeholder="请输入营业执照名称"/>
+            name="customerName"
+            placeholder="请输入营业执照名称"
+            v-model="customer.customerName"/>
         </a-form-item>
         <a-form-item
           label="统一社会信用代码"
@@ -20,35 +21,64 @@
           :wrapperCol="{lg: {span: 10}, sm: {span: 17} }">
           <a-input
             v-decorator="[
-              'businessLicense',
+              'socialCreditCode',
               {rules: [{ required: true, message: '请输入统一社会信用代码' }]}
             ]"
-            name="businessLicense"
-            placeholder="请输入营业执照统一社会信用代码"/>
+            name="socialCreditCode"
+            placeholder="请输入营业执照统一社会信用代码"
+            v-model="customer.socialCreditCode" />
         </a-form-item>
         <a-form-item
-          label="充值账户名称"
-          :labelCol="{lg: {span: 7}, sm: {span: 7}}"
-          :wrapperCol="{lg: {span: 10}, sm: {span: 17} }">
-          <a-input
-            v-decorator="[
-              'bankName',
-              {rules: [{ required: true, message: '请输入充值账户名称' }]}
-            ]"
-            name="bankName"
-            placeholder="用于在平台中充值的账户名称"/>
-        </a-form-item>
-        <a-form-item
-          label="充值账户账号"
+          label="银行账号"
           :labelCol="{lg: {span: 7}, sm: {span: 7}}"
           :wrapperCol="{lg: {span: 10}, sm: {span: 17} }">
           <a-input
             v-decorator="[
               'bankAcc',
-              {rules: [{ required: true, message: '请输入充值账户账号' }]}
+              {rules: [{ required: true, message: '请输入银行账号' }]}
             ]"
             name="bankAcc"
-            placeholder="用于在平台中充值的账户账号"/>
+            placeholder="用于在平台中充值的银行账号"
+            v-model="customer.bankAcc"/>
+        </a-form-item>
+        <a-form-item
+          label="开户户名"
+          :labelCol="{lg: {span: 7}, sm: {span: 7}}"
+          :wrapperCol="{lg: {span: 10}, sm: {span: 17} }">
+          <a-input
+            v-decorator="[
+              'bankAccName',
+              {rules: [{ required: true, message: '请输入开户户名' }]}
+            ]"
+            name="bankAccName"
+            placeholder="用于在平台中开户户名"
+            v-model="customer.bankAccName"/>
+        </a-form-item>
+        <a-form-item
+          label="联行号"
+          :labelCol="{lg: {span: 7}, sm: {span: 7}}"
+          :wrapperCol="{lg: {span: 10}, sm: {span: 17} }">
+          <a-input
+            v-decorator="[
+              'bankCode',
+              {rules: [{ required: true, message: '请输入联行号' }]}
+            ]"
+            name="bankCode"
+            placeholder="用于在平台中联行号"
+            v-model="customer.bankCode"/>
+        </a-form-item>
+        <a-form-item
+          label="开户行"
+          :labelCol="{lg: {span: 7}, sm: {span: 7}}"
+          :wrapperCol="{lg: {span: 10}, sm: {span: 17} }">
+          <a-input
+            v-decorator="[
+              'bankName',
+              {rules: [{ required: true, message: '请输入开户户名' }]}
+            ]"
+            name="bankName"
+            placeholder="用于在平台中开户行"
+            v-model="customer.bankName"/>
         </a-form-item>
         <a-form-item
           label="管理员姓名"
@@ -56,11 +86,12 @@
           :wrapperCol="{lg: {span: 5}, sm: {span: 8} }">
           <a-input
             v-decorator="[
-              'managerMan',
+              'adminName',
               {rules: [{ required: true, message: '请输入管理员姓名' }]}
             ]"
-            name="managerMan"
-            placeholder="商户方在平台中的管理员"/>
+            name="adminName"
+            placeholder="商户方在平台中的管理员"
+            v-model="customer.adminName"/>
         </a-form-item>
         <a-form-item
           label="管理员手机号"
@@ -68,11 +99,12 @@
           :wrapperCol="{lg: {span: 5}, sm: {span: 8} }">
           <a-input
             v-decorator="[
-              'phoneNo',
+              'adminPhone',
               {rules: [{ required: true, message: '请输入管理员手机号' }]}
             ]"
-            name="phoneNo"
-            placeholder="用于登陆酬金代发平台"/>
+            name="adminPhone"
+            placeholder="用于登陆酬金代发平台"
+            v-model="customer.adminPhone"/>
         </a-form-item>
         <a-form-item
           label="管理员邮箱"
@@ -80,11 +112,12 @@
           :wrapperCol="{lg: {span: 5}, sm: {span: 8} }">
           <a-input
             v-decorator="[
-              'mail',
+              'adminMail',
               {rules: [{ required: true, message: '请输入管理员邮箱' }]}
             ]"
-            name="mail"
-            placeholder="用于接收对账单"/>
+            name="adminMail"
+            placeholder="用于接收对账单"
+            v-model="customer.adminMail"/>
         </a-form-item>
 
         <a-form-item
@@ -101,10 +134,13 @@
 </template>
 
 <script>
+  import { registerCustomer } from '@/api/customer'
 export default {
   name: 'CustomerRegistered',
   data() {
     return {
+      customer: {
+      },
       form: this.$form.createForm(this)
     }
   },
@@ -113,7 +149,13 @@ export default {
       e.preventDefault()
       this.form.validateFields((err, values) => {
         if (!err) {
-          console.log('Received values of form: ', values)
+          registerCustomer(this.customer).then((res) => {
+            if (res.code === 0) {
+              this.$message.success(res.msg)
+            } else {
+              this.$message.warning(res.msg)
+            }
+          })
         }
       })
     }

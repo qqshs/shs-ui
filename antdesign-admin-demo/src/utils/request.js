@@ -12,6 +12,12 @@ const request = axios.create({
   timeout: 6000 // 请求超时时间
 })
 
+request.bytterRouter = {
+  bytterEdmPay: '/bytterEdmPay',
+  businessBasic: '/businessBasic',
+}
+
+
 // 异常拦截处理器
 const errorHandler = (error) => {
 
@@ -44,16 +50,16 @@ const errorHandler = (error) => {
 
 // request interceptor
 request.interceptors.request.use(config => {
-  const tempRequest = ['/auth/login', '/user/nav', '/auth/logout']
-  // console.warn('以下接口 临时走前端服务,如需调试移除后保存即可 无需重启. \n', tempRequest.join('\n'))
-  if (tempRequest.includes(config.url)) {
-    config.baseURL = '/local'
-  }
+  // const tempRequest = ['/auth/login', ]
+  // // console.warn('以下接口 临时走前端服务,如需调试移除后保存即可 无需重启. \n', tempRequest.join('\n'))
+  // if (tempRequest.includes(config.url)) {
+  //   config.baseURL = '/local'
+  // }
   const token = storage.get(ACCESS_TOKEN)
   // 如果 token 存在
   // 让每个请求携带自定义 token 请根据实际情况自行修改
   if (token) {
-    config.headers['Access-Token'] = token
+    config.headers['Authorization'] = token
   }
   return config
 }, errorHandler)

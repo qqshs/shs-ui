@@ -7,6 +7,19 @@ const RouteView = {
   render: (h) => h('router-view')
 }
 
+export const rootRouter = {
+  key: '',
+  name: 'tempIndex',
+  path: '/',
+  component: BasicLayout,
+  redirect: '/dashboard',
+  meta: {
+    title: ''
+  },
+  children: [
+  ]
+}
+
 export const asyncRouterMap = [
 
   {
@@ -62,7 +75,7 @@ export const asyncRouterMap = [
             path: '/customer/customer-registered',
             name: 'CustomerRegistered',
             meta: { title: '商户注册', keepAlive: true, permission: [ 'customer' ] },
-            component: ()=> import('@/views/customer/customerRegistered')
+            component: ()=> import('@/views/customer/CustomerRegistered')
           },
           {
             path: '/customer/customer-details',
@@ -96,6 +109,33 @@ export const asyncRouterMap = [
             name: 'CommissionAccDtl',
             meta: {title: '酬金账户交易流水查询',keepAlive: true,permission: ['commission-acc']},
             component: ()=> import('@/views/commissionAcc/AccDtl')
+          }
+        ]
+      },
+       //electronicContract
+       {
+        path: '/electronic-contract',
+        redirect: '/electronic-contract/contract-import',
+        component: RouteView,
+        meta: {title: '签约中心',icon: 'bank', permission: ['electronic-contract']},
+        children: [
+          {
+            path: '/electronic-contract/contract-import',
+            name: 'ContractImport',
+            meta: {title: '用户导入', keepAlive: true, permission: ['electronic-contract']},
+            component: ()=> import('@/views/eContract/ContractImport')
+          },
+          {
+            path: '/electronic-contract/contract-sign',
+            name: 'ContractSign',
+            meta: {title: '用户签约',keepAlive: true,permission: ['electronic-contract']},
+            component: ()=> import('@/views/eContract/ContractSign')
+          },
+          {
+            path: '/electronic-contract/contract-details',
+            name: 'ContractDetails',
+            meta: {title: '签约详情',keepAlive: true,permission: ['commission-acc']},
+            component: ()=> import('@/views/eContract/ContractDetails')
           }
         ]
       },
@@ -390,6 +430,7 @@ export const asyncRouterMap = [
  * @type { *[] }
  */
 export const constantRouterMap = [
+  rootRouter,
   {
     path: '/user',
     component: UserLayout,

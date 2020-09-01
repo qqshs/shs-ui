@@ -12,7 +12,7 @@ NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
 const whiteList = ['login', 'register', 'registerResult'] // no redirect whitelist
 const loginRoutePath = '/user/login'
-const defaultRoutePath = '/dashboard/workplace'
+const defaultRoutePath = '/'
 
 router.beforeEach((to, from, next) => {
   NProgress.start() // start progress bar
@@ -23,24 +23,26 @@ router.beforeEach((to, from, next) => {
       next({ path: defaultRoutePath })
       NProgress.done()
     } else {
-      if (store.getters.addRouters.length === 0) {       
-        store.dispatch('GenerateRoutes').then(() => {
+      if (store.getters.addRouters.length === 0) {
+        store.dispatch('GenerateRoutes').then((res) => {
           // 根据roles权限生成可访问的路由表
           // 动态添加可访问路由表
-          router.addRoutes(store.getters.addRouters)
+          router.addRoutes(res)
           // 请求带有 redirect 重定向时，登录自动重定向到该地址
           const redirect = decodeURIComponent(from.query.redirect || to.path)
           if (to.path === redirect) {
             // set the replace: true so the navigation will not leave a history record
             next({ ...to, replace: true })
+            // next()
           } else {
             // 跳转到目的路由
             next({ path: redirect })
           }
-        }).catch(() => {
+        }).catch((err) => {
+          console.log(err)
           notification.error({
             message: '错误',
-            description: '请求用户信息失败，请重试'
+            description: '重新登陆！'
           })
           // 失败时，获取用户信息失败时，调用登出，来清空历史保留信息
           store.dispatch('Logout').then(() => {

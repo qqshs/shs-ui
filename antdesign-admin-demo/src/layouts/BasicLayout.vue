@@ -27,7 +27,7 @@ import { SettingDrawer, updateTheme } from '@ant-design-vue/pro-layout'
 import { i18nRender } from '@/locales'
 import { mapState } from 'vuex'
 import { SIDEBAR_TYPE, TOGGLE_MOBILE_TYPE } from '@/store/mutation-types'
-import { asyncRouterMap } from '@/config/router.config.js'
+// import { asyncRouterMap } from '@/config/router.config.js'
 
 import defaultSettings from '@/config/defaultSettings'
 import RightContent from '@/components/GlobalHeader/RightContent'
@@ -82,8 +82,8 @@ export default {
     })
   },
   created () {
-    this.menus = asyncRouterMap.find((item) => item.path === '/').children
-    // this.menus = this.mainMenu.find((item) => item.path === '/').children
+    // this.menus = asyncRouterMap.find((item) => item.path === '/').children
+    this.menus = this.mainMenu.find((item) => item.path === '/').children
     this.collapsed = !this.sidebarOpened
     // 处理侧栏收起状态
     this.$watch('collapsed', () => {

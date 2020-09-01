@@ -4,8 +4,10 @@
       <a-descriptions title="商户信息">
         <a-descriptions-item label="商户名称">{{customer.customerName}}</a-descriptions-item>
         <a-descriptions-item label="统一社会信用代码">{{customer.socialCreditCode}}</a-descriptions-item>
-        <a-descriptions-item label="充值账户名称">{{customer.accountName}}</a-descriptions-item>
-        <a-descriptions-item label="充值账户账号">{{customer.accountCode}}</a-descriptions-item>
+        <a-descriptions-item label="银行账号">{{customer.bankAcc}}</a-descriptions-item>
+        <a-descriptions-item label="开户户名">{{ customer.bankAccName }}</a-descriptions-item>
+        <a-descriptions-item label="联行号">{{ customer.bankCode }}</a-descriptions-item>
+        <a-descriptions-item label="开户行">{{ customer.bankName }}</a-descriptions-item>
       </a-descriptions>
       <a-divider style="margin-bottom: 32px" />
       <a-descriptions title="管理员信息">
@@ -42,9 +44,9 @@
     </a-card>
     <a-card style="margin-top: 24px" :bordered="false" title="平台账户详情">
       <a-descriptions title="平台账户余额">
-        <a-descriptions-item label="账户余额">987,872.89</a-descriptions-item>
-        <a-descriptions-item label="未付金额">18,923.98</a-descriptions-item>
-        <a-descriptions-item label="最后充值日期">2020-08-13 16:30</a-descriptions-item>
+        <a-descriptions-item label="账户余额">{{customerBal.availBal}}</a-descriptions-item>
+        <a-descriptions-item label="未付金额">{{customerBal.frzBal}}</a-descriptions-item>
+        <a-descriptions-item label="最后充值日期">{{data[0].transTime}}</a-descriptions-item>
       </a-descriptions>
       <a-divider style="margin-bottom: 32px" />
       <a-descriptions title="平台账户充值记录"></a-descriptions>
@@ -54,11 +56,12 @@
 </template>
 
 <script>
+  import { getCustomerDetail,getCustomerBal,getChangeRecord } from '@/api/customer'
 const columns = [
   {
     title: '日期',
-    dataIndex: 'date',
-    key: 'date',
+    dataIndex: 'transTime',
+    key: 'transTime',
   },
   {
     title: '充值金额',
@@ -71,50 +74,57 @@ const data = [
     key: '1',
     date: '2020-08-14 15:37:02',
     money: 178267.88,
-  },
-  {
-    key: '2',
-    date: '2020-08-14 09:41:35',
-    money: 19000.0,
-  },
-  {
-    key: '3',
-    date: '2020-08-13 17:33:12',
-    money: 29081.56,
-  },
-  {
-    key: '4',
-    date: '2020-08-13 16:00:01',
-    money: 3000.0,
-  },
-  {
-    key: '5',
-    date: '2020-08-13 13:45:56',
-    money: 9800.0,
-  },
+  }
 ]
 export default {
   name: 'CustomerDetails',
   data() {
     return {
+      customerBal: {
+      },
       customer: {
-        customerName: '',
-        socialCreditCode: '',
-        accountName: '',
-        accountCode: '',
-        adminName: '',
-        adminPhone: '',
-        adminMail: '',
-        createTime: '',
-        updateTime: '',
-        status: ''
       },
       columns,
       data,
     }
   },
-  methods: {},
-  mounted() {},
+  methods: {
+    getCustomerDetail(){
+      getCustomerDetail({ adminPhone: '17671795549' }).then((res) => {
+        if (res.code === 0) {
+          this.customer = res.data
+          this.$message.success(res.msg)
+        } else {
+          this.$message.warning(res.msg)
+        }
+      })
+    },
+    getCustomerBal(){
+      getCustomerBal({  }).then((res) => {
+        if (res.code === 0) {
+          this.customerBal = res.data[0]
+          this.$message.success(res.msg)
+        } else {
+          this.$message.warning(res.msg)
+        }
+      })
+    },
+    getChangeRecord(){
+      getChangeRecord({  }).then((res) => {
+        if (res.code === 0) {
+          this.data = res.data
+          this.$message.success(res.msg)
+        } else {
+          this.$message.warning(res.msg)
+        }
+      })
+    }
+  },
+  mounted() {
+    this.getCustomerDetail()
+    this.getCustomerBal()
+    this.getChangeRecord()
+  },
 }
 </script>
 

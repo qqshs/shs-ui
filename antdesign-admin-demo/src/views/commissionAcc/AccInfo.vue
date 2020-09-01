@@ -2,11 +2,11 @@
   <page-header-wrapper :title="false">
     <a-card :bordered="false" title="酬金账户详情">
       <a-descriptions title="账户详情">
-        <a-descriptions-item label="商户名称">远洋进出口贸易有限公司</a-descriptions-item>
-        <a-descriptions-item label="充值账户名称">远洋进出口贸易有限公司</a-descriptions-item>
-        <a-descriptions-item label="充值账户账号">9877691099010001</a-descriptions-item>
+        <a-descriptions-item label="商户名称">{{customer.customerName}}</a-descriptions-item>
+        <a-descriptions-item label="充值账户名称">{{customer.accountName}}</a-descriptions-item>
+        <a-descriptions-item label="充值账户账号">{{customer.accountCode}}</a-descriptions-item>
         <a-descriptions-item label="账户余额">
-          500,908.98
+          xxxxxxxxx
           <a-tooltip placement="right">
             <template slot="title" >
               刷新余额
@@ -28,6 +28,7 @@
 </template>
 
 <script>
+  import { getCustomerDetail } from '@/api/customer'
 const columns = [
   {
     title: '日期',
@@ -88,10 +89,37 @@ export default {
   name: 'AccInfo',
   data(){
     return{
+      customer: {
+        customerName: '',
+        socialCreditCode: '',
+        accountName: '',
+        accountCode: '',
+        adminName: '',
+        adminPhone: '',
+        adminMail: '',
+        createTime: '',
+        updateTime: '',
+        status: ''
+      },
       columns,
       data
     }
-  }
+  },
+  methods: {
+    getCustomerDetail(){
+      getCustomerDetail({ adminPhone: '17671795549' }).then((res) => {
+        if (res.code === 0) {
+          this.customer = res.data
+          this.$message.success(res.msg)
+        } else {
+          this.$message.warning(res.msg)
+        }
+      })
+    }
+  },
+  mounted() {
+    this.getCustomerDetail()
+  },
 }
 </script>
 

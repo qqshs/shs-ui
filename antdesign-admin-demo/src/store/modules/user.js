@@ -43,6 +43,7 @@ const user = {
           const token = response.data
           storage.set(ACCESS_TOKEN, token, 7 * 24 * 60 * 60 * 1000)
           commit('SET_TOKEN', token)
+        
           resolve()
         }).catch(error => {
           reject(error)
@@ -93,6 +94,7 @@ const user = {
           commit('SET_TOKEN', '')
           commit('SET_ROLES', [])
           storage.remove(ACCESS_TOKEN)
+          location.href = '/'
         })
       })
     }

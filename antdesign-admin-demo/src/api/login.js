@@ -1,8 +1,8 @@
 import request from '@/utils/request'
 
 const userApi = {
-  Login: '/businessBasic/userLogin/login_login',
-  Logout: '/businessBasic/userLogin/login_logout',
+  Login: request.bytterRouter.businessBasic + '/businessBasic/userLogin/login_login',
+  Logout: request.bytterRouter.businessBasic + '/businessBasic/userLogin/login_logout',
   ForgePassword: '/auth/forge-password',
   Register: '/auth/register',
   twoStepCode: '/auth/2step-code',
@@ -10,7 +10,7 @@ const userApi = {
   SendSmsErr: '/account/sms_err',
   // get my info
   UserInfo: '/user/info',
-  UserMenu: '/user/nav'
+  UserMenu: request.bytterRouter.businessBasic + '/businessBasic/menumanage/widget_menu'
 }
 
 /**
