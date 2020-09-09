@@ -20,10 +20,10 @@
           :wrapperCol="{lg: {span: 10}, sm: {span: 17} }">
           <a-input
             v-decorator="[
-              'businessLicense',
+              'pinNo',
               {rules: [{ required: true, message: '请输入用户身份证号' }]}
             ]"
-            name="businessLicense"
+            name="pinNo"
             placeholder="请输入用户身份证号"/>
         </a-form-item>
         <a-form-item
@@ -65,8 +65,10 @@
 </template>
 
 <script>
+import { eContractUrl } from '@/api/econtract'
+
 export default {
-  name: 'CustomerRegistered',
+  name: 'ContractSign',
   data() {
     return {
       form: this.$form.createForm(this)
@@ -76,9 +78,22 @@ export default {
     handleSubmit (e) {
       e.preventDefault()
       this.form.validateFields((err, values) => {
-        if (!err) {
-          console.log('Received values of form: ', values)
+        if (err) {
+          return
         }
+        const contract = {}
+        contract.name = values['name']
+        contract.pinNo = values['pinNo']
+        contract.phoneNo = values['phoneNo']
+        contract.bankAcc = values['bankAcc']
+        contract.bankAccName = values['bankAccName']
+        eContractUrl(contract).then((res) => {
+          if (res.code === 0) {
+            this.$message.success(res.msg)
+          } else {
+            this.$message.warning(res.msg)
+          }
+        })
       })
     }
   }

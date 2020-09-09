@@ -9,6 +9,10 @@ import store from './store/'
 import i18n from './locales'
 import { VueAxios } from './utils/request'
 import ProLayout, { PageHeaderWrapper } from '@ant-design-vue/pro-layout'
+import { STable } from '@/components'
+import EnumSelect from '@/components/Select/EnumSelect' // 自定义 枚举下拉
+
+import { GetEnumItems, exportDataExcel } from '@/api/common'
 import themePluginConfig from '../config/themePluginConfig'
 import '@/permission'
 // mock
@@ -22,11 +26,14 @@ import './utils/filter' // global filter
 import './global.less'
 
 Vue.config.productionTip = false
+Vue.prototype.comAPI = { GetEnumItems, exportDataExcel }
 
 // mount axios to `Vue.$http` and `this.$http`
 Vue.use(VueAxios)
 Vue.component('pro-layout', ProLayout)
 Vue.component('page-header-wrapper', PageHeaderWrapper)
+Vue.component('enum-select', EnumSelect)
+Vue.component('STable', STable)
 
 window.umi_plugin_ant_themeVar = themePluginConfig.theme
 

@@ -116,7 +116,7 @@
 
 <script>
 import moment from 'moment'
-import { STable } from '@/components'
+import {  } from '@/components'
 import { getRoleList, getServiceList } from '@/api/manage'
 
 export default {

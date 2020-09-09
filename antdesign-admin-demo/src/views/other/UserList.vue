@@ -163,7 +163,7 @@
 
 <script>
 import pick from 'lodash.pick'
-import { STable } from '@/components'
+import {  } from '@/components'
 import { getRoleList, getServiceList } from '@/api/manage'
 import { PERMISSION_ENUM } from '@/utils/helper/permission'
 

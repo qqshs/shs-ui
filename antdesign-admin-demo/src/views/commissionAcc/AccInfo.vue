@@ -3,15 +3,15 @@
     <a-card :bordered="false" title="酬金账户详情">
       <a-descriptions title="账户详情">
         <a-descriptions-item label="商户名称">{{customer.customerName}}</a-descriptions-item>
-        <a-descriptions-item label="充值账户名称">{{customer.accountName}}</a-descriptions-item>
-        <a-descriptions-item label="充值账户账号">{{customer.accountCode}}</a-descriptions-item>
+        <a-descriptions-item label="开户户名">{{customer.bankAccName}}</a-descriptions-item>
+        <a-descriptions-item label="银行账号">{{customer.bankAcc}}</a-descriptions-item>
         <a-descriptions-item label="账户余额">
-          xxxxxxxxx
+          {{customerBal.availBal}}
           <a-tooltip placement="right">
             <template slot="title" >
               刷新余额
             </template>
-            <a-icon type="reload" style="margin-left: 8px"/>
+            <a-icon type="reload" style="margin-left: 8px" v-on:click="getCustomerBal"/>
           </a-tooltip>
         </a-descriptions-item>
       </a-descriptions>
@@ -28,78 +28,46 @@
 </template>
 
 <script>
-  import { getCustomerDetail } from '@/api/customer'
+  import { getCustomerDetail,getCustomerBal,getChangeRecord } from '@/api/customer'
 const columns = [
   {
-    title: '日期',
-    dataIndex: 'date',
-    key: 'date'
-
+    title: '商户名称',
+    dataIndex: 'customerName',
+  },
+  {
+    title: '付款银行',
+    dataIndex: 'bankName',
+  },
+  {
+    title: '付款银行卡',
+    dataIndex: 'payerAcc',
   },
   {
     title: '充值金额',
     dataIndex: 'money',
-    key: 'money'
+  },
+  {
+    title: '状态',
+    dataIndex: 'statusName',
+  },
+  {
+    title: '创建时间',
+    dataIndex: 'createTime',
+  },
+  {
+    title: '交易时间',
+    dataIndex: 'transTime',
+  },
 
-  }
 ]
-const data = [
-  {
-    key: '1',
-    date: '2020-08-14 15:37:02',
-    money: 178267.88
-  },
-  {
-    key: '2',
-    date: '2020-08-14 09:41:35',
-    money: 19000.00
-  },
-  {
-    key: '3',
-    date: '2020-08-13 17:33:12',
-    money: 29081.56
-  },
-  {
-    key: '4',
-    date: '2020-08-13 16:00:01',
-    money: 3000.00
-  },
-  {
-    key: '5',
-    date: '2020-08-13 13:45:56',
-    money: 9800.00
-  },
-  /*{
-      key: '1',
-      month: '五月',
-      saleCount: 178267.88
-  },*/
-  /*{
-      key: '1',
-      month: '六月',
-      saleCount: 178267.88
-  },
-  {
-      key: '1',
-      month: '七月',
-      saleCount: 178267.88
-  }*/
-]
+const data = []
 export default {
   name: 'AccInfo',
   data(){
     return{
+      customerBal: {
+      },
       customer: {
-        customerName: '',
-        socialCreditCode: '',
-        accountName: '',
-        accountCode: '',
-        adminName: '',
-        adminPhone: '',
-        adminMail: '',
-        createTime: '',
-        updateTime: '',
-        status: ''
       },
       columns,
       data
@@ -107,9 +75,29 @@ export default {
   },
   methods: {
     getCustomerDetail(){
-      getCustomerDetail({ adminPhone: '17671795549' }).then((res) => {
+      getCustomerDetail({ }).then((res) => {
         if (res.code === 0) {
           this.customer = res.data
+          this.$message.success(res.msg)
+        } else {
+          this.$message.warning(res.msg)
+        }
+      })
+    },
+    getCustomerBal(){
+      getCustomerBal({  }).then((res) => {
+        if (res.code === 0) {
+          this.customerBal = res.data[0]
+          this.$message.success(res.msg)
+        } else {
+          this.$message.warning(res.msg)
+        }
+      })
+    },
+    getChangeRecord(){
+      getChangeRecord({  }).then((res) => {
+        if (res.code === 0) {
+          this.data = res.data
           this.$message.success(res.msg)
         } else {
           this.$message.warning(res.msg)
@@ -119,6 +107,8 @@ export default {
   },
   mounted() {
     this.getCustomerDetail()
+    this.getCustomerBal()
+    this.getChangeRecord()
   },
 }
 </script>

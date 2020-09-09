@@ -2,104 +2,99 @@
   <page-header-wrapper :title="false">
     <a-card :bordered="false" title="酬金账户充值查询">
       <div class="table-page-search-wrapper">
-        <a-form layout="inline">
+        <a-form :form="form" layout="inline">
           <a-row :gutter="48">
             <a-col :md="8" :sm="24">
               <a-form-item label="充值日期">
-                <a-range-picker v-model="searchDate" />
+                <a-range-picker v-decorator="['startTime-endTime']" />
               </a-form-item>
             </a-col>
           </a-row>
           <a-row :gutter="48">
             <a-col :md="8" :sm="24">
-              <a-button type="primary">查询</a-button>
+              <a-button type="primary" @click="refresh">查询</a-button>
             </a-col>
           </a-row>
         </a-form>
       </div>
     </a-card>
-    <a-card :bordered="false" :loading="loading">
+
+    <a-card :bordered="false">
       <div class="table-operator">
-        <a-table :columns="columns" :bordered="true" :data-source="data" :pagination="true"></a-table>
+        <s-table
+          ref="table"
+          size="default"
+          rowKey="id"
+          :columns="columns"
+          :dataHandles="dataHandles"
+          showPagination="auto"
+        ></s-table>
       </div>
     </a-card>
   </page-header-wrapper>
 </template>
 
 <script>
+import { getChangeRecordList } from '@/api/customer'
+import { Ellipsis } from '@/components'
+
 const columns = [
   {
-    title: '日期',
-    dataIndex: 'date',
-    key: 'date',
+    title: '商户名称',
+    dataIndex: 'customerName',
+  },
+  {
+    title: '付款银行',
+    dataIndex: 'bankName',
+  },
+  {
+    title: '付款银行卡',
+    dataIndex: 'payerAcc',
   },
   {
     title: '充值金额',
     dataIndex: 'money',
-    key: 'money',
-  },
-]
-const data = [
-  {
-    key: '1',
-    date: '2020-08-14 15:37:02',
-    money: 178267.88,
   },
   {
-    key: '2',
-    date: '2020-08-14 09:41:35',
-    money: 19000.0,
+    title: '状态',
+    dataIndex: 'statusName',
   },
   {
-    key: '3',
-    date: '2020-08-13 17:33:12',
-    money: 29081.56,
+    title: '创建时间',
+    dataIndex: 'createTime',
   },
   {
-    key: '4',
-    date: '2020-08-13 16:00:01',
-    money: 3000.0,
+    title: '交易时间',
+    dataIndex: 'transTime',
   },
-  {
-    key: '5',
-    date: '2020-08-13 13:45:56',
-    money: 9800.0,
-  },
-  /*{
-      key: '1',
-      month: '五月',
-      saleCount: 178267.88
-  },*/
-  /*{
-      key: '1',
-      month: '六月',
-      saleCount: 178267.88
-  },
-  {
-      key: '1',
-      month: '七月',
-      saleCount: 178267.88
-  }*/
 ]
 export default {
+  components: {
+    Ellipsis,
+  },
   name: 'AccBal',
   data() {
+    const formVm = this.$form.createForm(this)
     return {
-      searchDate: [],
+      form: formVm,
+      dataHandles: {
+        listApi: getChangeRecordList,
+        form: formVm,
+        handleRequest: (req) => {},
+        handleResponse: (res) => {},
+        initialParams: {},
+      },
       columns,
-      data,
       loading: true,
     }
   },
   mounted() {
-    this.loadAll() //模拟从后台获取数据后，显示数据，隐藏骨架屏
   },
   methods: {
-    loadAll() {
-      //加载完数据后，隐藏骨架屏
-
-      this.loading = false
+    refresh() {
+      this.$refs.table.refresh(true)
     },
+
   },
 }
 </script>

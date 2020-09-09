@@ -79,13 +79,13 @@
 </template>
 
 <script>
-import { STable } from '@/components'
+import {  } from '@/components'
 import RoleModal from './modules/RoleModal'
 
 export default {
   name: 'TableList',
   components: {
-    STable,
+    
     RoleModal
   },
   data () {

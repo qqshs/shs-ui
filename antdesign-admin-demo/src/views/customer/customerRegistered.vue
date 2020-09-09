@@ -12,8 +12,7 @@
               {rules: [{ required: true, message: '请输入商户名称' }]}
             ]"
             name="customerName"
-            placeholder="请输入营业执照名称"
-            v-model="customer.customerName"/>
+            placeholder="请输入营业执照名称"/>
         </a-form-item>
         <a-form-item
           label="统一社会信用代码"
@@ -25,8 +24,7 @@
               {rules: [{ required: true, message: '请输入统一社会信用代码' }]}
             ]"
             name="socialCreditCode"
-            placeholder="请输入营业执照统一社会信用代码"
-            v-model="customer.socialCreditCode" />
+            placeholder="请输入营业执照统一社会信用代码"/>
         </a-form-item>
         <a-form-item
           label="银行账号"
@@ -38,8 +36,7 @@
               {rules: [{ required: true, message: '请输入银行账号' }]}
             ]"
             name="bankAcc"
-            placeholder="用于在平台中充值的银行账号"
-            v-model="customer.bankAcc"/>
+            placeholder="用于在平台中充值的银行账号"/>
         </a-form-item>
         <a-form-item
           label="开户户名"
@@ -51,8 +48,7 @@
               {rules: [{ required: true, message: '请输入开户户名' }]}
             ]"
             name="bankAccName"
-            placeholder="用于在平台中开户户名"
-            v-model="customer.bankAccName"/>
+            placeholder="用于在平台中开户户名"/>
         </a-form-item>
         <a-form-item
           label="联行号"
@@ -64,8 +60,7 @@
               {rules: [{ required: true, message: '请输入联行号' }]}
             ]"
             name="bankCode"
-            placeholder="用于在平台中联行号"
-            v-model="customer.bankCode"/>
+            placeholder="用于在平台中联行号"/>
         </a-form-item>
         <a-form-item
           label="开户行"
@@ -74,11 +69,10 @@
           <a-input
             v-decorator="[
               'bankName',
-              {rules: [{ required: true, message: '请输入开户户名' }]}
+              {rules: [{ required: true, message: '请输入开户行' }]}
             ]"
             name="bankName"
-            placeholder="用于在平台中开户行"
-            v-model="customer.bankName"/>
+            placeholder="用于在平台中开户行"/>
         </a-form-item>
         <a-form-item
           label="管理员姓名"
@@ -90,8 +84,7 @@
               {rules: [{ required: true, message: '请输入管理员姓名' }]}
             ]"
             name="adminName"
-            placeholder="商户方在平台中的管理员"
-            v-model="customer.adminName"/>
+            placeholder="商户方在平台中的管理员"/>
         </a-form-item>
         <a-form-item
           label="管理员手机号"
@@ -103,8 +96,7 @@
               {rules: [{ required: true, message: '请输入管理员手机号' }]}
             ]"
             name="adminPhone"
-            placeholder="用于登陆酬金代发平台"
-            v-model="customer.adminPhone"/>
+            placeholder="用于登陆酬金代发平台"/>
         </a-form-item>
         <a-form-item
           label="管理员邮箱"
@@ -116,8 +108,19 @@
               {rules: [{ required: true, message: '请输入管理员邮箱' }]}
             ]"
             name="adminMail"
-            placeholder="用于接收对账单"
-            v-model="customer.adminMail"/>
+            placeholder="用于接收对账单"/>
+        </a-form-item>
+        <a-form-item
+          label="用户登录账号"
+          :labelCol="{lg: {span: 7}, sm: {span: 7}}"
+          :wrapperCol="{lg: {span: 5}, sm: {span: 8} }">
+          <a-input
+            v-decorator="[
+              'userCode',
+              {rules: [{ required: true, message: '请输入登录账号' }]}
+            ]"
+            name="userCode"
+            placeholder="用于用户登录"/>
         </a-form-item>
 
         <a-form-item
@@ -139,8 +142,6 @@ export default {
   name: 'CustomerRegistered',
   data() {
     return {
-      customer: {
-      },
       form: this.$form.createForm(this)
     }
   },
@@ -148,15 +149,27 @@ export default {
     handleSubmit (e) {
       e.preventDefault()
       this.form.validateFields((err, values) => {
-        if (!err) {
-          registerCustomer(this.customer).then((res) => {
-            if (res.code === 0) {
-              this.$message.success(res.msg)
-            } else {
-              this.$message.warning(res.msg)
-            }
-          })
+        if (err) {
+            return
         }
+        const customer = {}
+        customer.customerName = values['customerName']
+        customer.socialCreditCode = values['socialCreditCode']
+        customer.bankAcc = values['bankAcc']
+        customer.bankAccName = values['bankAccName']
+        customer.bankCode = values['bankCode']
+        customer.bankName = values['bankName']
+        customer.adminName = values['adminName']
+        customer.adminPhone = values['adminPhone']
+        customer.adminMail = values['adminMail']
+        customer.userCode = values['userCode']
+        registerCustomer(customer).then((res) => {
+          if (res.code === 0) {
+            this.$message.success(res.msg)
+          } else {
+            this.$message.warning(res.msg)
+          }
+        })
       })
     }
   }

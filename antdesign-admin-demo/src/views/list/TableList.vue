@@ -120,7 +120,7 @@
 
 <script>
 import moment from 'moment'
-import { STable, Ellipsis } from '@/components'
+import {  Ellipsis } from '@/components'
 import { getRoleList, getServiceList } from '@/api/manage'
 
 import StepByStepModal from './modules/StepByStepModal'
@@ -187,7 +187,7 @@ const statusMap = {
 export default {
   name: 'TableList',
   components: {
-    STable,
+    
     Ellipsis,
     CreateForm,
     StepByStepModal

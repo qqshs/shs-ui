@@ -2,7 +2,7 @@ import T from 'ant-design-vue/es/table/Table'
 import get from 'lodash.get'
 
 export default {
-  data () {
+  data() {
     return {
       needTotalList: [],
 
@@ -19,10 +19,39 @@ export default {
       type: [String, Function],
       default: 'key'
     },
-    data: {
-      type: Function,
+    // data: {
+    //   type: Function,
+    //   required: true
+    // },
+    // table 数据来源api
+    dataHandles: {
+      type: Object,
       required: true
     },
+    /****
+     * table 数据来源api
+     * {
+          "code": 0,
+          "msg": "成功！",
+          "data": [],
+          "page": {
+              "pageCount": 1,
+              "currentPage": 1,
+              "resultCount": 17,
+              "pageSize": 50,
+              "pageList": [ 10, 30,50, 100 ],
+              "changePageNumber": 0,
+              "startRowNum": 0,
+              "endRowNum": 50,
+              "isLastPage": true,
+              "isFirstPage": true
+          }
+      }
+     * 
+     * 
+     */
+
+
     pageNum: {
       type: Number,
       default: 1
@@ -62,22 +91,13 @@ export default {
       type: String | Boolean,
       default: 'auto'
     },
-    /**
-     * enable page URI mode
-     *
-     * e.g:
-     * /users/1
-     * /users/2
-     * /users/3?queryParam=test
-     * ...
-     */
     pageURI: {
       type: Boolean,
       default: false
     }
   }),
   watch: {
-    'localPagination.current' (val) {
+    'localPagination.current'(val) {
       this.pageURI && this.$router.push({
         ...this.$route,
         name: this.$route.name,
@@ -90,23 +110,23 @@ export default {
       this.selectedRowKeys = []
       this.selectedRows = []
     },
-    pageNum (val) {
+    pageNum(val) {
       Object.assign(this.localPagination, {
         current: val
       })
     },
-    pageSize (val) {
+    pageSize(val) {
       Object.assign(this.localPagination, {
         pageSize: val
       })
     },
-    showSizeChanger (val) {
+    showSizeChanger(val) {
       Object.assign(this.localPagination, {
         showSizeChanger: val
       })
     }
   },
-  created () {
+  created() {
     const { pageNo } = this.$route.params
     const localPageNum = this.pageURI && (pageNo && parseInt(pageNo)) || this.pageNum
     this.localPagination = ['auto', true].includes(this.showPagination) && Object.assign({}, this.localPagination, {
@@ -123,43 +143,44 @@ export default {
      * 如果参数为 true, 则强制刷新到第一页
      * @param Boolean bool
      */
-    refresh (bool = false) {
+    refresh(bool = false) {
       bool && (this.localPagination = Object.assign({}, {
         current: 1, pageSize: this.pageSize
       }))
       this.loadData()
     },
-    /**
-     * 加载数据方法
-     * @param {Object} pagination 分页选项器
-     * @param {Object} filters 过滤条件
-     * @param {Object} sorter 排序条件
-     */
-    loadData (pagination, filters, sorter) {
+   
+
+    loadData(pagination, filters, sorter) {
       this.localLoading = true
       const parameter = Object.assign({
-        pageNo: (pagination && pagination.current) ||
+        page: (pagination && pagination.current) ||
           this.showPagination && this.localPagination.current || this.pageNum,
-        pageSize: (pagination && pagination.pageSize) ||
+        limit: (pagination && pagination.pageSize) ||
           this.showPagination && this.localPagination.pageSize || this.pageSize
       },
-      (sorter && sorter.field && {
-        sortField: sorter.field
-      }) || {},
-      (sorter && sorter.order && {
-        sortOrder: sorter.order
-      }) || {}, {
+        (sorter && sorter.field && {
+          sortField: sorter.field
+        }) || {},
+        (sorter && sorter.order && {
+          sortOrder: sorter.order
+        }) || {}, {
         ...filters
-      }
+      },
+        this.dataHandles.initialParams || {},
+        this.getSearchFormValues() // 获取form参数
       )
-      const result = this.data(parameter)
-      // 对接自己的通用数据接口需要修改下方代码中的 r.pageNo, r.totalCount, r.data
-      // eslint-disable-next-line
-      if ((typeof result === 'object' || typeof result === 'function') && typeof result.then === 'function') {
-        result.then(r => {
+
+      // 请求前执行 handleRequest
+      this.dataHandles.handleRequest && this.dataHandles.handleRequest(parameter)
+      // 调用接口
+      this.dataHandles.listApi(parameter)
+        .then(r => {
+          this.dataHandles.handleResponse && this.dataHandles.handleResponse(r)
+
           this.localPagination = this.showPagination && Object.assign({}, this.localPagination, {
-            current: r.pageNo, // 返回结果中的当前分页数
-            total: r.totalCount, // 返回结果中的总记录数
+            current: r.page.currentPage, // 返回结果中的当前分页数
+            total: r.page.resultCount, // 返回结果中的总记录数
             showSizeChanger: this.showSizeChanger,
             pageSize: (pagination && pagination.pageSize) ||
               this.localPagination.pageSize
@@ -174,7 +195,7 @@ export default {
           // 这里用于判断接口是否有返回 r.totalCount 且 this.showPagination = true 且 pageNo 和 pageSize 存在 且 totalCount 小于等于 pageNo * pageSize 的大小
           // 当情况满足时，表示数据不满足分页大小，关闭 table 分页功能
           try {
-            if ((['auto', true].includes(this.showPagination) && r.totalCount <= (r.pageNo * this.localPagination.pageSize))) {
+            if ((['auto', true].includes(this.showPagination) && r.page.resultCount <= (r.pageNo * this.localPagination.pageSize))) {
               this.localPagination.hideOnSinglePage = true
             }
           } catch (e) {
@@ -183,9 +204,34 @@ export default {
           this.localDataSource = r.data // 返回结果中的数组数据
           this.localLoading = false
         })
-      }
+
     },
-    initTotalList (columns) {
+    /**
+     * 获取 表格头部 search 内的值 并自动转换 monment 对象
+     * 如需要触发验证效果 请在handleRequest 中触发
+     */
+    getSearchFormValues() {
+      const seqrchParams = {}
+      if (this.dataHandles.form && this.dataHandles.form.getFieldsValue) {
+        const formValues = this.dataHandles.form.getFieldsValue()
+        // 目前只考虑 monment monment数组的转换
+        for (const k in formValues) {
+          const item = formValues[k]
+          const itemType = Object.prototype.toString.call(item)
+          if (item && item._isAMomentObject === true) {
+            seqrchParams[k] = item.format('YYYY-MM-DD')
+          } else if (itemType === '[object Array]' && item[0] && item[0]._isAMomentObject === true) {
+            const dateRangeNames = k.split('-')
+            seqrchParams[dateRangeNames[0]] = item[0].format('YYYY-MM-DD')
+            seqrchParams[dateRangeNames[1]] = item[1].format('YYYY-MM-DD')
+          } else {
+            seqrchParams[k] = item
+          }
+        }
+      }
+      return seqrchParams
+    },
+    initTotalList(columns) {
       const totalList = []
       columns && columns instanceof Array && columns.forEach(column => {
         if (column.needTotal) {
@@ -202,7 +248,7 @@ export default {
      * @param selectedRowKeys
      * @param selectedRows
      */
-    updateSelect (selectedRowKeys, selectedRows) {
+    updateSelect(selectedRowKeys, selectedRows) {
       this.selectedRows = selectedRows
       this.selectedRowKeys = selectedRowKeys
       const list = this.needTotalList
@@ -219,7 +265,7 @@ export default {
     /**
      * 清空 table 已选中项
      */
-    clearSelected () {
+    clearSelected() {
       if (this.rowSelection) {
         this.rowSelection.onChange([], [])
         this.updateSelect([], [])
@@ -230,7 +276,7 @@ export default {
      * @param callback
      * @returns {*}
      */
-    renderClear (callback) {
+    renderClear(callback) {
       if (this.selectedRowKeys.length <= 0) return null
       return (
         <a style="margin-left: 24px" onClick={() => {
@@ -239,7 +285,7 @@ export default {
         }}>清空</a>
       )
     },
-    renderAlert () {
+    renderAlert() {
       // 绘制统计列数据
       const needTotalItems = this.needTotalList.map((item) => {
         return (<span style="margin-right: 12px">
@@ -267,7 +313,7 @@ export default {
     }
   },
 
-  render () {
+  render() {
     const props = {}
     const localKeys = Object.keys(this.$data)
     const showAlert = (typeof this.alert === 'object' && this.alert !== null && this.alert.show) && typeof this.rowSelection.selectedRowKeys !== 'undefined' || this.alert
@@ -301,15 +347,15 @@ export default {
       return props[k]
     })
     const table = (
-      <a-table {...{ props, scopedSlots: { ...this.$scopedSlots } }} onChange={this.loadData} onExpand={ (expanded, record) => { this.$emit('expand', expanded, record) } }>
-        { Object.keys(this.$slots).map(name => (<template slot={name}>{this.$slots[name]}</template>)) }
+      <a-table {...{ props, scopedSlots: { ...this.$scopedSlots } }} onChange={this.loadData} onExpand={(expanded, record) => { this.$emit('expand', expanded, record) }}>
+        {Object.keys(this.$slots).map(name => (<template slot={name}>{this.$slots[name]}</template>))}
       </a-table>
     )
 
     return (
       <div class="table-wrapper">
-        { showAlert ? this.renderAlert() : null }
-        { table }
+        {showAlert ? this.renderAlert() : null}
+        {table}
       </div>
     )
   }

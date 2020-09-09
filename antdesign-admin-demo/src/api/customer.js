@@ -6,6 +6,8 @@ const customerApi = {
   getCustomerDetail: request.bytterRouter.bytterEdmPay + '/bytterEdmPay/customer/detail',
   getCustomerBal: request.bytterRouter.bytterEdmPay + '/bytterEdmPay/change/getCustomerBal',
   getChangeRecord: request.bytterRouter.bytterEdmPay + '/bytterEdmPay/change/getChangeRecord',
+  getChangeRecordList: request.bytterRouter.bytterEdmPay + '/bytterEdmPay/change/getChangeRecordList',
+  getPayFlowRecordList: request.bytterRouter.bytterEdmPay + '/bytterEdmPay/payFlow/getPayFlowRecordList',
 }
 
 export function registerCustomer (parameter) {
@@ -43,6 +45,22 @@ export function getCustomerBal (parameter) {
 export function getChangeRecord (parameter) {
   return request({
     url: customerApi.getChangeRecord,
+    method: 'post',
+    data: parameter
+  })
+}
+
+export function getChangeRecordList (parameter) {
+  return request({
+    url: customerApi.getChangeRecordList,
+    method: 'post',
+    data: parameter
+  })
+}
+
+export function getPayFlowRecordList (parameter) {
+  return request({
+    url: customerApi.getPayFlowRecordList,
     method: 'post',
     data: parameter
   })

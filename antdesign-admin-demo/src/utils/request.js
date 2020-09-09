@@ -50,23 +50,27 @@ const errorHandler = (error) => {
 
 // request interceptor
 request.interceptors.request.use(config => {
-  // const tempRequest = ['/auth/login', ]
+  // const tempRequest = [
+  //   '/businessBasic/businessBasic/dict/getDictByCodeAndType']
   // // console.warn('以下接口 临时走前端服务,如需调试移除后保存即可 无需重启. \n', tempRequest.join('\n'))
   // if (tempRequest.includes(config.url)) {
   //   config.baseURL = '/local'
   // }
+
+  // config.baseURL = '/local'
   const token = storage.get(ACCESS_TOKEN)
   // 如果 token 存在
   // 让每个请求携带自定义 token 请根据实际情况自行修改
   if (token) {
     config.headers['Authorization'] = token
   }
+  config.method = config.method || 'get'
   return config
 }, errorHandler)
 
 // response interceptor
 request.interceptors.response.use((response) => {
-  
+
   return response.data
 }, errorHandler)
 

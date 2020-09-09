@@ -4,7 +4,7 @@ import nav from './dataBases/nav'
 import login from './dataBases/login'
 export default [
   {
-    url: '/auth/login',
+    url: '/businessBasic/businessBasic/userLogin/login_login',
     type: 'post',
     response: config => {
       return login
@@ -22,8 +22,8 @@ export default [
     type: 'post',
     response: config => {
       return {
-        result:{},
-        message:'[测试接口] 注销成功'
+        result: {},
+        message: '[测试接口] 注销成功'
       }
     }
   },

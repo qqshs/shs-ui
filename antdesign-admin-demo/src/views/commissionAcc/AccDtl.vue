@@ -2,113 +2,114 @@
   <page-header-wrapper :title="false">
     <a-card :bordered="false" title="酬金账户交易流水查询">
       <div class="table-page-search-wrapper">
-        <a-form layout="inline">
+        <a-form :form="form" layout="inline">
           <a-row :gutter="48">
             <a-col :md="8" :sm="24">
               <a-form-item label="交易日期">
-                <a-range-picker v-model="searchDate"/>
+                <a-range-picker v-decorator="['startTime-endTime']"/>
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24">
               <a-form-item label="收方账户名">
-                <a-input v-model="reciveAccName"></a-input>
+                <a-input v-decorator="['payeeAccName']"></a-input>
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24">
               <a-form-item label="收方账号">
-                <a-input v-model="reciveAccNo"></a-input>
+                <a-input v-decorator="['payerAcc']"></a-input>
               </a-form-item>
             </a-col>
           </a-row>
           <a-row :gutter="48">
             <a-col :md="8" :sm="24">
-              <a-button type="primary">查询</a-button>
+              <a-button type="primary" @click="refresh">查询</a-button>
             </a-col>
           </a-row>
         </a-form>
       </div>
     </a-card>
-  
-    <a-card :bordered="false" :loading="loading">
+
+    <a-card :bordered="false">
       <div class="table-operator">
-        <a-table :columns="columns" :bordered="true" :data-source="data" :pagination="true"></a-table>
+        <s-table
+          ref="table"
+          size="default"
+          rowKey="id"
+          :columns="columns"
+          :dataHandles="dataHandles"
+          showPagination="auto"
+        ></s-table>
       </div>
     </a-card>
   </page-header-wrapper>
 </template>
 
 <script>
+  import { getPayFlowRecordList } from '@/api/customer'
+  import { Ellipsis } from '@/components'
 const columns = [
   {
-    title: '日期',
-    dataIndex: 'date',
-    key: 'date',
+    title: '商户名称',
+    dataIndex: 'customerName',
+  },
+  {
+    title: '订单号',
+    dataIndex: 'payId',
+  },
+  {
+    title: '落地公司',
+    dataIndex: 'landName',
   },
   {
     title: '收方户名',
-    dataIndex: 'reciveBankAccName',
-    key: 'reciveBankAccName',
+    dataIndex: 'payeeAccName',
   },
   {
     title: '收方账号',
-    dataIndex: 'reciveBankAcc',
-    key: 'reciveBankAcc',
+    dataIndex: 'payerAcc',
+  },
+  {
+    title: '身份证号',
+    dataIndex: 'pinNo',
   },
   {
     title: '交易金额',
-    dataIndex: 'money',
-    key: 'money',
+    dataIndex: 'fee',
+  },
+  {
+    title: '日期',
+    dataIndex: 'returnTime',
     align:'right'
   },
 ]
-const data = [
-  {
-    key: '1',
-    date: '2020-08-14 15:37:02',
-    reciveBankAccName:'杰克马',
-    reciveBankAcc:'95588804000910015',
-    money: 178267.88,
-  },
-  {
-    key: '2',
-    date: '2020-08-14 09:41:35',
-    reciveBankAccName:'小马哥',
-    reciveBankAcc:'43909777910001881',
-    money: 19000.0,
-  },
-  {
-    key: '3',
-    date: '2020-08-13 17:33:12',
-    reciveBankAccName:'杰克马',
-    reciveBankAcc:'95588804000910015',
-    money: 29081.56,
-  },
-  {
-    key: '4',
-    date: '2020-08-13 16:00:01',
-    reciveBankAccName:'小马哥',
-    reciveBankAcc:'43909777910001881',
-    money: 3000.0,
-  },
-  {
-    key: '5',
-    date: '2020-08-13 13:45:56',
-    reciveBankAccName:'小马哥',
-    reciveBankAcc:'43909777910001881',
-    money: 9800.0,
-  }
-]
 export default {
+  components: {
+    Ellipsis,
+  },
   name: 'AccDtl',
   data() {
+    const formVm = this.$form.createForm(this)
     return {
-      searchDate: [],
-      reciveAccName: '',
-      reciveAccNo: '',
+      form: formVm,
+      dataHandles: {
+        listApi: getPayFlowRecordList,
+        form: formVm,
+        handleRequest: (req) => {},
+        handleResponse: (res) => {},
+        initialParams: {},
+      },
       columns,
-      data
+      loading: true,
     }
-  }
+  },
+  mounted() {
+    // this.loadAll() //模拟从后台获取数据后，显示数据，隐藏骨架屏
+  },
+  methods: {
+    refresh() {
+      this.$refs.table.refresh(true)
+    },
+  },
 }
 </script>
 

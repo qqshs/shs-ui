@@ -1,6 +1,7 @@
 import Mock from 'mockjs'
 
 import user from './user'
+import example from './example'
 
 // function param2Obj(url) {
 //   const search = url.split('?')[1]
@@ -18,7 +19,9 @@ import user from './user'
 //   )
 // }
 
-const mocks = user
+const mocks = [].concat(example,user)
+// const mocks = example
+// const mocks = 
 
 // for front mock
 // please use it cautiously, it will redefine XMLHttpRequest,

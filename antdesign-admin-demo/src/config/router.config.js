@@ -456,7 +456,12 @@ export const constantRouterMap = [
         path: 'recover',
         name: 'recover',
         component: undefined
-      }
+      },
+      {
+        path: '/payeeAgreement',
+        name: 'payeeAgreement',
+        component: () => import(/* webpackChunkName: "user" */ '@/views/user/PayeeAgreement')
+      },
     ]
   },
 

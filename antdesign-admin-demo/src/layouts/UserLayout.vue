@@ -21,6 +21,9 @@
           <a href="_self">隐私</a>
           <a href="_self">条款</a>
         </div>-->
+        <div class="links">
+          <a href="http://www.beian.miit.gov.cn/" target="_blank">粤ICP备05105073号-1</a>
+        </div>
         <div class="copyright">
           Copyright &copy; 2020 深圳市拜特科技股份有限公司
         </div>

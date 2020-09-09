@@ -21,7 +21,7 @@ const locale = {
   'app.setting.fixedheader':'固定头部',
   'app.setting.fixedsidebar':'固定菜单',
   'app.setting.othersettings':'其他设置',
-  'app.setting.weakmode':'暗黑模式',
+  'app.setting.weakmode':'无障碍模式',
   'app.setting.copy':'复制设置'
 }
 
