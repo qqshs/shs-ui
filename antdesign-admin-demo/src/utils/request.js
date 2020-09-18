@@ -4,7 +4,7 @@ import storage from 'store'
 import notification from 'ant-design-vue/es/notification'
 import { VueAxios } from './axios'
 import { ACCESS_TOKEN } from '@/store/mutation-types'
-
+import Router from '@/router'
 // 创建 axios 实例
 const request = axios.create({
   // API 请求的默认前缀
@@ -14,6 +14,7 @@ const request = axios.create({
 
 request.bytterRouter = {
   bytterEdmPay: '/bytterEdmPay',
+  fileService: '/fileService',
   businessBasic: '/businessBasic',
 }
 
@@ -64,13 +65,18 @@ request.interceptors.request.use(config => {
   if (token) {
     config.headers['Authorization'] = token
   }
+  config.headers['B-R-CODE'] = Router.app.$route.meta.id || '-1'
+
   config.method = config.method || 'get'
   return config
 }, errorHandler)
 
 // response interceptor
 request.interceptors.response.use((response) => {
-
+  const res = response.data
+  if (res instanceof Blob) {
+    return response
+  }
   return response.data
 }, errorHandler)
 

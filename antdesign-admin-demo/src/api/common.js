@@ -1,21 +1,10 @@
 import request from '@/utils/request'
 
 const api = {
-  dictionary: request.bytterRouter.businessBasic + '/businessBasic/dict/getDictByCodeAndType',
-  customerLandSelect: request.bytterRouter.bytterEdmPay + '/bytterEdmPay/ajax/customerLandSelect',
-  customerUserAdd:  request.bytterRouter.bytterEdmPay + '/bytterEdmPay/file/customerUser/list/add'
+  downloadTemplate: request.bytterRouter.fileService + '/fileService/downloadTemplate'
 }
-// 传参：code(字典组的code。唯一标识该下拉/radio的编码。sys_dict_group的code字段)
 
 export default api
-
-export function GetEnumItems(parameter) {
-  return request({
-    url: api.dictionary,
-    method: 'post',
-    data: parameter
-  })
-}
 
 // export function exportDataExcel(params, url, fileName, methodType = 'post') {
 export function exportDataExcel({ method, url, fileName, params }) {
@@ -54,19 +43,13 @@ export function exportDataExcel({ method, url, fileName, params }) {
   })
 }
 
-export function customerLandSelect() {
-  return request({
-    url: api.customerLandSelect,
-    method: 'post',
-    data:{}
-  })
-}
+export function downloadTemplateByQuery(data) {
 
-export function customerUserAdd(data) {
   return request({
-    url: api.customerUserAdd,
+    url: api.downloadTemplate,
     method: 'post',
-    data
+    responseType: 'blob', // 防止返回乱码
+    data: data
   })
 }
 

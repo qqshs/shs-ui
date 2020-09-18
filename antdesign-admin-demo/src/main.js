@@ -11,13 +11,12 @@ import { VueAxios } from './utils/request'
 import ProLayout, { PageHeaderWrapper } from '@ant-design-vue/pro-layout'
 import { STable } from '@/components'
 import EnumSelect from '@/components/Select/EnumSelect' // 自定义 枚举下拉
+import CustomerLandSelect from '@/components/Select/CustomerLandSelect' // 自定义 枚举下拉
+import CustomerSelect from '@/components/Select/CustomerSelect' // 自定义 枚举下拉
 
 import { GetEnumItems, exportDataExcel } from '@/api/common'
 import themePluginConfig from '../config/themePluginConfig'
 import '@/permission'
-// mock
-// WARNING: `mockjs` NOT SUPPORT `IE` PLEASE DO NOT USE IN `production` ENV.
-// import './mock'
 
 import bootstrap from './core/bootstrap'
 import './core/lazy_use'
@@ -33,6 +32,8 @@ Vue.use(VueAxios)
 Vue.component('pro-layout', ProLayout)
 Vue.component('page-header-wrapper', PageHeaderWrapper)
 Vue.component('enum-select', EnumSelect)
+Vue.component('CustomerLandSelect', CustomerLandSelect)
+Vue.component('CustomerSelect', CustomerSelect)
 Vue.component('STable', STable)
 
 window.umi_plugin_ant_themeVar = themePluginConfig.theme

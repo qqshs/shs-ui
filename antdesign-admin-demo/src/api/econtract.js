@@ -1,13 +1,15 @@
 import request from '@/utils/request'
+import api from './bytterAjax'
 
 const contractApi = {
-  agreementList: request.bytterRouter.bytterEdmPay + '/bytterEdmPay/agreement/get',
+  customerUserList: request.bytterRouter.bytterEdmPay + '/bytterEdmPay/customerUser/get',
   eContractUrl: request.bytterRouter.bytterEdmPay + '/bytterEdmPay/contract/eContract',
+  customerUserAdd:  request.bytterRouter.bytterEdmPay + '/bytterEdmPay/customerUser/list/add'
 }
 
-export function agreementList (parameter) {
+export function customerUserList (parameter) {
   return request({
-    url: contractApi.agreementList,
+    url: contractApi.customerUserList,
     method: 'post',
     data: parameter
   })
@@ -22,4 +24,16 @@ export function eContractUrl (parameter) {
   })
 }
 
+
+/**
+ * 商户用户导入新增
+ * @param data
+ */
+export function customerUserAdd(data) {
+  return request({
+    url: contractApi.customerUserAdd,
+    method: 'post',
+    data
+  })
+}
 

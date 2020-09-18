@@ -2,38 +2,49 @@
   <page-header-wrapper :title="false">
     <a-card :bordered="false" title="签约详情">
       <div class="table-page-search-wrapper">
-        <a-form layout="inline">
+        <a-form :form="form" layout="inline">
           <a-row :gutter="48">
             <a-col :md="8" :sm="24">
+              <a-form-item label="交易日期">
+                <a-range-picker v-decorator="['startDate-endDate']" />
+              </a-form-item>
+            </a-col>
+            <a-col :md="8" :sm="24">
               <a-form-item label="用户名">
-                <a-input v-model="queryParam.name"></a-input>
+                <a-input v-decorator="['name']"></a-input>
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24">
               <a-form-item label="身份证号">
-                <a-input v-model="queryParam.pinNo"></a-input>
+                <a-input v-decorator="['pinNo']"></a-input>
               </a-form-item>
             </a-col>
             <template v-if="advanced">
               <a-col :md="8" :sm="24">
                 <a-form-item label="批次号">
-                  <a-input v-model="queryParam.batchNo"></a-input>
+                  <a-input v-decorator="['batchNo']"></a-input>
                 </a-form-item>
               </a-col>
               <a-col :md="8" :sm="24">
-                <a-form-item label="落地">
-                  <a-input v-model="queryParam.customerLandId"></a-input>
-                </a-form-item>
+                <CustomerSelect
+                  :localStyle="{width:'200px'}"
+                  :localDecorator="['customerIds', { rules: [{ required: false, message: 'required 类型!' }] }]"
+                  @change="initLandSelect"
+                ></CustomerSelect>
               </a-col>
               <a-col :md="8" :sm="24">
-                <a-form-item label="签约日期">
-                  <a-range-picker v-model="queryParam.createTime" />
-                </a-form-item>
+               <CustomerLandSelect
+                  ref="refCustomerLandSelect"
+                  :localStyle="{width:'200px'}"
+                  :localDecorator="['landIds', { rules: [{ required: false, message: 'required 类型!' }] }]"
+                ></CustomerLandSelect>
               </a-col>
               <a-col :md="8" :sm="24">
-                <a-form-item>
-                  <enum-select v-model="status" enumCode="voucherStat" ref="enumCode"></enum-select>
-                </a-form-item>
+                <enum-select
+                  enumCode="agreement"
+                  ref="enumCode"
+                  :decorator="['agreementStatuss', { rules: []}]"
+                ></enum-select>
               </a-col>
             </template>
             <a-col :md="!advanced && 8 || 24" :sm="24">
@@ -41,7 +52,7 @@
                 class="table-page-search-submitButtons"
                 :style="advanced && { float: 'right', overflow: 'hidden' } || {} "
               >
-                <a-button type="primary" @click="$refs.table.refresh(true)">查询</a-button>
+                <a-button type="primary" @click="$refs.table.refresh()">查询</a-button>
                 <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">重置</a-button>
                 <a @click="toggleAdvanced" style="margin-left: 8px">
                   {{ advanced ? '收起' : '展开' }}
@@ -56,59 +67,29 @@
 
     <a-card style="margin-top: 24px" :bordered="false">
       <div class="table-operator">
-        <a-button type="primary" @click="handleAdd">导出</a-button>
-        <a-dropdown v-action:edit v-if="selectedRowKeys.length > 0">
-          <a-button style="margin-left: 8px">
-            批量操作
-            <a-icon type="down" />
-          </a-button>
-        </a-dropdown>
+        <ExportExcel fileName="签约详情" :form="form" :listApi="exports()" :columns="columns"></ExportExcel>
       </div>
 
-      <s-table
-        ref="table"
-        size="default"
-        rowKey="key"
-        :columns="columns"
-        :data="loadData"
-        :showAlert="false"
-        :rowSelection="rowSelection"
-        showPagination="auto"
-      >
-        <span slot="serial" slot-scope="text, record, index">{{ index + 1 }}</span>
-        <span slot="status" slot-scope="text">
-          <a-badge :status="text | statusTypeFilter" :text="text | statusFilter" />
-        </span>
-        <span slot="description" slot-scope="text">
-          <ellipsis :length="4" tooltip>{{ text }}</ellipsis>
-        </span>
-
-        <span slot="action" slot-scope="text, record">
-          <template>
-            <a @click="handleEdit(record)">查询</a>
-            <a-divider type="vertical" />
-          </template>
-        </span>
-      </s-table>
-
-      <create-form
-        ref="createModal"
-        :visible="visible"
-        :loading="confirmLoading"
-        :model="mdl"
-        @cancel="handleCancel"
-        @ok="handleOk"
-      />
-      <step-by-step-modal ref="modal" @ok="handleOk" />
+      <div class="table-operator">
+        <s-table
+          ref="table"
+          size="default"
+          rowKey="customerUserId"
+          :columns="columns"
+          :dataHandles="dataHandles"
+          showPagination="auto"
+          :scroll="{ x: 2600 }"
+        ></s-table>
+      </div>
     </a-card>
   </page-header-wrapper>
 </template>
 
 <script>
 import moment from 'moment'
-import {  Ellipsis } from '@/components'
-import { agreementList } from '@/api/econtract'
-
+import { Ellipsis,ExportExcel } from '@/components'
+import { customerUserList } from '@/api/econtract'
+import CustomerSelect from '@/components/Select/CustomerSelect' // 自定义 枚举下拉
 import StepByStepModal from '@/views/list/modules/StepByStepModal'
 import CreateForm from '@/views/list/modules/CreateForm'
 
@@ -116,39 +97,57 @@ const columns = [
   {
     title: '签约编号',
     dataIndex: 'customerUserId',
-  },
-  {
-    title: '导入时间',
-    dataIndex: 'userCreateTime',
+    align: 'center',
+    width: 300
   },
   {
     title: '批次号',
     dataIndex: 'userBatchNo',
+    align: 'center',
+    width: 300
   },
   {
     title: '签约人姓名',
     dataIndex: 'userName',
+    align: 'center',
+    width:180
   },
   {
     title: '签约人身份证号',
     dataIndex: 'userPinNo',
+    align: 'center',
+    width:180
   },
   {
     title: '签约人手机号',
     dataIndex: 'userPhoneNo',
+    align: 'center',
+    width:180
   },
   {
     title: '商户名称',
     dataIndex: 'customerName',
+    align: 'center',
+    width:300
   },
   {
     title: '落地公司',
     dataIndex: 'landName',
+    align: 'center',
+    width:300
   },
   {
     title: '签约状态',
     dataIndex: 'agreementStatus',
+    align: 'center',
+    width:180
   },
+   {
+    title: '导入时间',
+    dataIndex: 'userCreateTime',
+    align: 'center',
+    width:180
+  }
   // ,
   // {
   //   title: '操作',
@@ -179,44 +178,30 @@ const statusMap = {
 
 export default {
   components: {
-    
     Ellipsis,
     CreateForm,
     StepByStepModal,
+    CustomerSelect,
+    ExportExcel,
   },
   data() {
     this.columns = columns
+    const formVm = this.$form.createForm(this)
     return {
+      form: formVm,
+      dataHandles: {
+        listApi: customerUserList,
+        form: formVm,
+        initialParams: {},
+      },
+      columns,
+      loading: true,
       // create model
       visible: false,
       confirmLoading: false,
       mdl: null,
       // 高级搜索 展开/关闭
       advanced: false,
-      // 查询参数
-      queryParam: {
-        name: '',
-        batchNo: '',
-        pinNo: '',
-        dataIndex: '',
-        customerLandId: '',
-        createTime: '',
-        status: '',
-      },
-      // 加载数据方法 必须为 Promise 对象
-      loadData: (parameter) => {
-        const requestParameters = Object.assign({}, parameter, this.queryParam)
-        console.log('loadData request parameters:', requestParameters)
-        return agreementList(requestParameters).then((res) => {
-          return {
-            pageSize: 10,
-            pageNo: 1,
-            totalCount: 100,
-            totalPage: 10,
-            data: res.data.list,
-          }
-        })
-      },
       selectedRowKeys: [],
       selectedRows: [],
     }
@@ -228,9 +213,6 @@ export default {
     statusTypeFilter(type) {
       return statusMap[type].status
     },
-  },
-  created() {
-    agreementList({ t: new Date() })
   },
   computed: {
     rowSelection() {
@@ -310,6 +292,15 @@ export default {
       this.queryParam = {
         date: moment(new Date()),
       }
+    },
+     initLandSelect(v) {
+        this.$refs.refCustomerLandSelect.initSelectOptions(v instanceof Array ? v : [v])
+        this.form.resetFields(['landIds'])
+      },
+      exports() {
+      return this.selectedRows.length === 0
+        ? this.dataHandles.listApi
+        : () => Promise.resolve({ data: this.selectedRows, code: 0 })
     },
   },
 }

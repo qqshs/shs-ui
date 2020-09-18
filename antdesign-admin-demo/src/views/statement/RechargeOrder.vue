@@ -2,38 +2,42 @@
   <page-header-wrapper :title="false">
     <a-card :bordered="false" title="充值对账单">
       <div class="table-page-search-wrapper">
-        <a-form layout="inline">
+         <a-form :form="form" layout="inline">
           <a-row :gutter="48">
             <a-col :md="8" :sm="24">
-              <a-form-item label="用户名">
-                <a-input v-model="queryParam.name"></a-input>
+              <a-form-item label="交易日期">
+                <a-range-picker v-decorator="['startDate-endDate']" />
               </a-form-item>
             </a-col>
-            <a-col :md="8" :sm="24">
-              <a-form-item label="身份证号">
-                <a-input v-model="queryParam.pinNo"></a-input>
-              </a-form-item>
+             <a-col :md="8" :sm="24">
+                <a-form-item label="充值单号">
+                    <a-input v-decorator="['id']"></a-input>
+                </a-form-item>
+            </a-col>
+             <a-col :md="8" :sm="24">
+                <a-form-item label="付款账号">
+                    <a-input v-decorator="['payerAcc']"></a-input>
+                </a-form-item>
             </a-col>
             <template v-if="advanced">
-              <a-col :md="8" :sm="24">
-                <a-form-item label="批次号">
-                  <a-input v-model="queryParam.batchNo"></a-input>
+               <a-col :md="8" :sm="24">
+                <a-form-item label="收款账号">
+                    <a-input v-decorator="['payeeAcc']"></a-input>
                 </a-form-item>
+            </a-col>
+              <a-col :md="8" :sm="24">
+                <CustomerSelect
+                  :localStyle="{width:'200px'}"
+                  :localDecorator="['customerIds', { rules: [{ required: false, message: 'required 类型!' }] }]"
+                  @change="initLandSelect"
+                ></CustomerSelect>
               </a-col>
               <a-col :md="8" :sm="24">
-                <a-form-item label="落地">
-                  <a-input v-model="queryParam.customerLandId"></a-input>
-                </a-form-item>
-              </a-col>
-              <a-col :md="8" :sm="24">
-                <a-form-item label="签约日期">
-                  <a-range-picker v-model="queryParam.createTime" />
-                </a-form-item>
-              </a-col>
-              <a-col :md="8" :sm="24">
-                <a-form-item>
-                  <enum-select v-model="status" enumCode="voucherStat" ref="enumCode"></enum-select>
-                </a-form-item>
+                <CustomerLandSelect
+                  ref="refCustomerLandSelect"
+                  :localStyle="{width:'200px'}"
+                  :localDecorator="['landIds', { rules: [{ required: false, message: 'required 类型!' }] }]"
+                ></CustomerLandSelect>
               </a-col>
             </template>
             <a-col :md="!advanced && 8 || 24" :sm="24">
@@ -56,263 +60,212 @@
 
     <a-card style="margin-top: 24px" :bordered="false">
       <div class="table-operator">
-        <a-button type="primary" @click="handleAdd">导出</a-button>
-        <a-dropdown v-action:edit v-if="selectedRowKeys.length > 0">
-          <a-button style="margin-left: 8px">
-            批量操作
-            <a-icon type="down" />
-          </a-button>
-        </a-dropdown>
+        <ExportExcel fileName="充值对账单" :form="form" :listApi="exports()" :columns="columns"></ExportExcel>
       </div>
 
-      <s-table
-        ref="table"
-        size="default"
-        rowKey="key"
-        :columns="columns"
-        :data="loadData"
-        :showAlert="false"
-        :rowSelection="rowSelection"
-        showPagination="auto"
-      >
-        <span slot="serial" slot-scope="text, record, index">{{ index + 1 }}</span>
-        <span slot="status" slot-scope="text">
-          <a-badge :status="text | statusTypeFilter" :text="text | statusFilter" />
-        </span>
-        <span slot="description" slot-scope="text">
-          <ellipsis :length="4" tooltip>{{ text }}</ellipsis>
-        </span>
-
-        <span slot="action" slot-scope="text, record">
-          <template>
-            <a @click="handleEdit(record)">查询</a>
-            <a-divider type="vertical" />
-          </template>
-        </span>
-      </s-table>
-
-      <create-form
-        ref="createModal"
-        :visible="visible"
-        :loading="confirmLoading"
-        :model="mdl"
-        @cancel="handleCancel"
-        @ok="handleOk"
-      />
-      <step-by-step-modal ref="modal" @ok="handleOk" />
+      <div class="table-operator">
+        <s-table
+          ref="table"
+          size="default"
+          rowKey="id"
+          :columns="columns"
+          :dataHandles="dataHandles"
+          showPagination="auto"
+          :scroll="{ x: 1800 }"
+        ></s-table>
+      </div>
     </a-card>
   </page-header-wrapper>
 </template>
 
 <script>
-  import moment from 'moment'
-  import { STable, Ellipsis } from '@/components'
-  import { agreementList } from '@/api/econtract'
+import moment from 'moment'
+import { Ellipsis,ExportExcel } from '@/components'
+import { rechargeOrderList } from '@/api/statement'
+import StepByStepModal from '@/views/list/modules/StepByStepModal'
+import CreateForm from '@/views/list/modules/CreateForm'
+import CustomerSelect from '@/components/Select/CustomerSelect' // 自定义 枚举下拉
 
-  import StepByStepModal from '@/views/list/modules/StepByStepModal'
-  import CreateForm from '@/views/list/modules/CreateForm'
-
-  const columns = [
-    {
-      title: '签约编号',
-      dataIndex: 'customerUserId',
-    },
-    {
-      title: '导入时间',
-      dataIndex: 'userCreateTime',
-    },
-    {
-      title: '批次号',
-      dataIndex: 'userBatchNo',
-    },
-    {
-      title: '签约人姓名',
-      dataIndex: 'userName',
-    },
-    {
-      title: '签约人身份证号',
-      dataIndex: 'userPinNo',
-    },
-    {
-      title: '签约人手机号',
-      dataIndex: 'userPhoneNo',
-    },
-    {
-      title: '商户名称',
-      dataIndex: 'customerName',
-    },
-    {
-      title: '落地公司',
-      dataIndex: 'landName',
-    },
-    {
-      title: '签约状态',
-      dataIndex: 'agreementStatus',
-    },
-    // ,
-    // {
-    //   title: '操作',
-    //   dataIndex: 'action',
-    //   width: '150px',
-    //   scopedSlots: { customRender: 'action' }
-    // }
-  ]
-
-  const statusMap = {
-    0: {
-      status: 'default',
-      text: '关闭',
-    },
-    1: {
-      status: 'processing',
-      text: '运行中',
-    },
-    2: {
-      status: 'success',
-      text: '已上线',
-    },
-    3: {
-      status: 'error',
-      text: '异常',
-    },
+const columns = [
+  {
+    title: '充值单号',
+    dataIndex: 'id',
+    align: 'center',
+    width: 300
+  },
+  {
+    title: '银行流水号',
+    dataIndex: 'bankSerialNo',
+    align: 'center',
+    width: 300
+  },
+  {
+    title: '商户名称',
+    dataIndex: 'customerName',
+    align: 'center',
+    width: 300
+  },
+  {
+    title: '商户付款账户',
+    dataIndex: 'payerAcc',
+    align: 'center',
+    width: 180
+  },
+   {
+    title: '落地公司',
+    dataIndex: 'landName',
+    align: 'center',
+    width: 300
+  },
+  {
+    title: '落地收款账户',
+    dataIndex: 'payeeAcc',
+    align: 'center',
+    width: 180
+  },
+  {
+    title: '充值金额',
+    dataIndex: 'money',
+     align: 'right',
+     width: 180
+  },
+  {
+    title: '交易时间',
+    dataIndex: 'transTime',
+    align: 'center',
+    width: 180
   }
+  // ,
+  // {
+  //   title: '操作',
+  //   dataIndex: 'action',
+  //   width: '150px',
+  //   scopedSlots: { customRender: 'action' }
+  // }
+]
 
-  export default {
-    components: {
-      STable,
-      Ellipsis,
-      CreateForm,
-      StepByStepModal,
+export default {
+  components: {
+    Ellipsis,
+    CreateForm,
+    StepByStepModal,
+    ExportExcel,
+  },
+  name: 'RechargeOrder',
+  data() {
+    const formVm = this.$form.createForm(this)
+    return {
+      form: formVm,
+      dataHandles: {
+        listApi: rechargeOrderList,
+        form: formVm,
+
+        initialParams: {},
+      },
+      columns,
+      loading: true,
+      // create model
+      visible: false,
+      confirmLoading: false,
+      mdl: null,
+      // 高级搜索 展开/关闭
+      advanced: false,
+      // 查询参数
+      queryParam: {
+        namem: '',
+        batchNo: '',
+        pinNo: '',
+        dataIndex: '',
+        customerLandId: '',
+        createTime: '',
+        status: '',
+      },
+      selectedRowKeys: [],
+      selectedRows: [],
+    }
+  },
+  methods: {
+    handleAdd() {
+      this.mdl = null
+      this.visible = true
     },
-    data() {
-      this.columns = columns
-      return {
-        // create model
-        visible: false,
-        confirmLoading: false,
-        mdl: null,
-        // 高级搜索 展开/关闭
-        advanced: false,
-        // 查询参数
-        queryParam: {
-          name: '',
-          batchNo: '',
-          pinNo: '',
-          dataIndex: '',
-          customerLandId: '',
-          createTime: '',
-          status: '',
-        },
-        // 加载数据方法 必须为 Promise 对象
-        loadData: (parameter) => {
-          const requestParameters = Object.assign({}, parameter, this.queryParam)
-          console.log('loadData request parameters:', requestParameters)
-          return agreementList(requestParameters).then((res) => {
-            return {
-              pageSize: 10,
-              pageNo: 1,
-              totalCount: 100,
-              totalPage: 10,
-              data: res.data.list,
-            }
-          })
-        },
-        selectedRowKeys: [],
-        selectedRows: [],
+    handleEdit(record) {
+      this.visible = true
+      this.mdl = { ...record }
+    },
+    handleOk() {
+      const form = this.$refs.createModal.form
+      this.confirmLoading = true
+      form.validateFields((errors, values) => {
+        if (!errors) {
+          console.log('values', values)
+          if (values.id > 0) {
+            // 修改 e.g.
+            new Promise((resolve, reject) => {
+              setTimeout(() => {
+                resolve()
+              }, 1000)
+            }).then((res) => {
+              this.visible = false
+              this.confirmLoading = false
+              // 重置表单数据
+              form.resetFields()
+              // 刷新表格
+              this.$refs.table.refresh()
+
+              this.$message.info('修改成功')
+            })
+          } else {
+            // 新增
+            new Promise((resolve, reject) => {
+              setTimeout(() => {
+                resolve()
+              }, 1000)
+            }).then((res) => {
+              this.visible = false
+              this.confirmLoading = false
+              // 重置表单数据
+              form.resetFields()
+              // 刷新表格
+              this.$refs.table.refresh()
+
+              this.$message.info('新增成功')
+            })
+          }
+        } else {
+          this.confirmLoading = false
+        }
+      })
+    },
+    handleCancel() {
+      this.visible = false
+
+      const form = this.$refs.createModal.form
+      form.resetFields() // 清理表单数据（可不做）
+    },
+    onSelectChange(selectedRowKeys, selectedRows) {
+      this.selectedRowKeys = selectedRowKeys
+      this.selectedRows = selectedRows
+    },
+    toggleAdvanced() {
+      this.advanced = !this.advanced
+    },
+    resetSearchForm() {
+      this.queryParam = {
+        date: moment(new Date()),
       }
     },
-    filters: {
-      statusFilter(type) {
-        return statusMap[type].text
+    initLandSelect(v) {
+        this.$refs.refCustomerLandSelect.initSelectOptions(v instanceof Array ? v : [v])
+        this.form.resetFields(['landIds'])
       },
-      statusTypeFilter(type) {
-        return statusMap[type].status
-      },
+       exports() {
+      return this.selectedRows.length === 0
+        ? this.dataHandles.listApi
+        : () => Promise.resolve({ data: this.selectedRows, code: 0 })
     },
-    created() {
-      agreementList({ t: new Date() })
-    },
-    computed: {
-      rowSelection() {
-        return {
-          selectedRowKeys: this.selectedRowKeys,
-          onChange: this.onSelectChange,
-        }
-      },
-    },
-    methods: {
-      handleAdd() {
-        this.mdl = null
-        this.visible = true
-      },
-      handleEdit(record) {
-        this.visible = true
-        this.mdl = { ...record }
-      },
-      handleOk() {
-        const form = this.$refs.createModal.form
-        this.confirmLoading = true
-        form.validateFields((errors, values) => {
-          if (!errors) {
-            console.log('values', values)
-            if (values.id > 0) {
-              // 修改 e.g.
-              new Promise((resolve, reject) => {
-                setTimeout(() => {
-                  resolve()
-                }, 1000)
-              }).then((res) => {
-                this.visible = false
-                this.confirmLoading = false
-                // 重置表单数据
-                form.resetFields()
-                // 刷新表格
-                this.$refs.table.refresh()
-
-                this.$message.info('修改成功')
-              })
-            } else {
-              // 新增
-              new Promise((resolve, reject) => {
-                setTimeout(() => {
-                  resolve()
-                }, 1000)
-              }).then((res) => {
-                this.visible = false
-                this.confirmLoading = false
-                // 重置表单数据
-                form.resetFields()
-                // 刷新表格
-                this.$refs.table.refresh()
-
-                this.$message.info('新增成功')
-              })
-            }
-          } else {
-            this.confirmLoading = false
-          }
-        })
-      },
-      handleCancel() {
-        this.visible = false
-
-        const form = this.$refs.createModal.form
-        form.resetFields() // 清理表单数据（可不做）
-      },
-      onSelectChange(selectedRowKeys, selectedRows) {
-        this.selectedRowKeys = selectedRowKeys
-        this.selectedRows = selectedRows
-      },
-      toggleAdvanced() {
-        this.advanced = !this.advanced
-      },
-      resetSearchForm() {
-        this.queryParam = {
-          date: moment(new Date()),
-        }
-      },
-    },
-  }
+  },
+}
 </script>
 
 <style scoped>

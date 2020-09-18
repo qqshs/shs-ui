@@ -95,7 +95,7 @@ const vueConfig = {
       }
     }
   },
-
+  lintOnSave: false,
   devServer: {
     host: 'localhost',
     // development server port 8000
@@ -104,9 +104,9 @@ const vueConfig = {
     proxy: {
       '/api': {
         // target: 'http://192.168.1.254:7000', // 后端服务 安新
-        // target: 'http://192.168.1.254:7000', // 后端服务 莫芳
-        target: 'http://192.168.1.193:7000', // 后端服务 园园
-        // target: 'http://localhost:7000', // 本地服务
+        // target: 'http://192.168.2.239:7000', // 后端服务 莫芳239
+        // target: 'http://192.168.1.193:7000', // 后端服务 园园
+        target: 'http://localhost:7000', // 本地服务
         ws: false,
         changeOrigin: true,
         pathRewrite: {
@@ -134,7 +134,6 @@ const vueConfig = {
 
   // disable source map in production
   productionSourceMap: false,
-  lintOnSave: undefined,
   // babel-loader no-ignore node_modules/*
   transpileDependencies: []
 }

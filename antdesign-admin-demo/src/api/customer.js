@@ -2,7 +2,8 @@ import request from '@/utils/request'
 
 const customerApi = {
   addCustomer: request.bytterRouter.bytterEdmPay + '/bytterEdmPay/customer/add',
-  updateCustomer: request.bytterRouter.bytterEdmPay + '/bytterEdmPay/customer/update',
+  updateCustomerBank: request.bytterRouter.bytterEdmPay + '/bytterEdmPay/customer/update/bank',
+  updateCustomerAdmin: request.bytterRouter.bytterEdmPay + '/bytterEdmPay/customer/update/admin',
   getCustomerDetail: request.bytterRouter.bytterEdmPay + '/bytterEdmPay/customer/detail',
   getCustomerBal: request.bytterRouter.bytterEdmPay + '/bytterEdmPay/change/getCustomerBal',
   getChangeRecord: request.bytterRouter.bytterEdmPay + '/bytterEdmPay/change/getChangeRecord',
@@ -10,17 +11,25 @@ const customerApi = {
   getPayFlowRecordList: request.bytterRouter.bytterEdmPay + '/bytterEdmPay/payFlow/getPayFlowRecordList',
 }
 
-export function registerCustomer (parameter) {
+export function updateCustomerBank (parameter) {
   return request({
-    url: customerApi.addCustomer,
+    url: customerApi.updateCustomerBank,
     method: 'post',
     data: parameter
   })
 }
 
-export function updateCustomer (parameter) {
+export function updateCustomerAdmin (parameter) {
   return request({
-    url: customerApi.updateCustomer,
+    url: customerApi.updateCustomerAdmin,
+    method: 'post',
+    data: parameter
+  })
+}
+
+export function registerCustomer (parameter) {
+  return request({
+    url: customerApi.addCustomer,
     method: 'post',
     data: parameter
   })

@@ -350,7 +350,7 @@ export default {
 
       const formData = new FormData()
       formData.append('importFile', this.nextData.fileList[0])
-      formData.append('type', 'payCommissionImport')
+      formData.append('type', 'xlsx')
       formData.append('customerId', this.nextData.formData.customerIds)
       /**
        * 最后的提交操作

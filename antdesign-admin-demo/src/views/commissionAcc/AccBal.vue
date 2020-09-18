@@ -9,10 +9,33 @@
                 <a-range-picker v-decorator="['startTime-endTime']" />
               </a-form-item>
             </a-col>
-          </a-row>
-          <a-row :gutter="48">
             <a-col :md="8" :sm="24">
-              <a-button type="primary" @click="refresh">查询</a-button>
+              <enum-select
+                enumCode="voucherStat"
+                ref="enumCode"
+                :decorator="['status', { rules: []}]"
+              ></enum-select>
+            </a-col>
+            <template v-if="advanced">
+              <a-col :md="8" :sm="24">
+                <CustomerSelect
+                  mode="multiple"
+                  :localDecorator="['customerIds', { rules: [{ required: false, message: 'required 类型!' }] }]"
+                ></CustomerSelect>
+              </a-col>
+            </template>
+            <a-col :md="!advanced && 8 || 24" :sm="24">
+              <span
+                class="table-page-search-submitButtons"
+                :style="advanced && { float: 'right', overflow: 'hidden' } || {} "
+              >
+                <a-button type="primary" @click="refresh">查询</a-button>
+                <a-button style="margin-left: 8px" @click="() => form.resetFields()">重置</a-button>
+                <a @click="toggleAdvanced" style="margin-left: 8px">
+                  {{ advanced ? '收起' : '展开' }}
+                  <a-icon :type="advanced ? 'up' : 'down'" />
+                </a>
+              </span>
             </a-col>
           </a-row>
         </a-form>
@@ -21,6 +44,8 @@
 
     <a-card :bordered="false">
       <div class="table-operator">
+<!--        <ExportExcel fileName="充值记录" :form="form" :listApi="dataHandles.listApi" :columns="columns"></ExportExcel>-->
+
         <s-table
           ref="table"
           size="default"
@@ -35,9 +60,10 @@
 </template>
 
 <script>
+import moment from 'moment'
 import { getChangeRecordList } from '@/api/customer'
-import { Ellipsis } from '@/components'
-
+import { Ellipsis, ExportExcel } from '@/components'
+import CustomerSelect from '@/components/Select/CustomerSelect'
 const columns = [
   {
     title: '商户名称',
@@ -50,6 +76,10 @@ const columns = [
   {
     title: '付款银行卡',
     dataIndex: 'payerAcc',
+  },
+  {
+    title: '落地公司',
+    dataIndex: 'landName',
   },
   {
     title: '充值金额',
@@ -71,6 +101,8 @@ const columns = [
 export default {
   components: {
     Ellipsis,
+    ExportExcel,
+    CustomerSelect,
   },
   name: 'AccBal',
   data() {
@@ -80,21 +112,22 @@ export default {
       dataHandles: {
         listApi: getChangeRecordList,
         form: formVm,
-        handleRequest: (req) => {},
-        handleResponse: (res) => {},
         initialParams: {},
       },
       columns,
       loading: true,
+      // 高级搜索 展开/关闭
+      advanced: false,
     }
   },
-  mounted() {
-  },
+  mounted() {},
   methods: {
     refresh() {
       this.$refs.table.refresh(true)
     },
-
+    toggleAdvanced() {
+      this.advanced = !this.advanced
+    },
   },
 }
 </script>

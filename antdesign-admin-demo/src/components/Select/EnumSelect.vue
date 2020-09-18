@@ -1,15 +1,14 @@
 <script>
-import { GetEnumItems } from '@/api/common'
+import { GetEnumItems } from '@/api/bytterAjax'
 
 // 使用方法
-// 无须引入
-// <a-form-item label="Note2">
-//         <enum-select
-//           enumCode="enumCodeXXX"
-//           ref="enumCode"
-//           v-decorator="['z3', { rules: [{ required: true, message: 'Please input your z3!' }] , initialValue : []}]"
-//         ></enum-select>
-//       </a-form-item>
+//  <a-form :form="form" :layout="'inline'">
+//       <enum-select
+//         enumCode="voucherStat"
+//         ref="enumCode"
+//         :decorator="['status', { rules: [{ required: true, message: 'Please input status!' }]}]"
+//       ></enum-select>
+//       </a-form>
 
 export default {
   name: 'EnumSelect',
@@ -24,26 +23,26 @@ export default {
     },
     triggerChange: Boolean,
     disabled: Boolean,
-    value: {
-      type: [Array, undefined, String],
-    },
     decorator: {
-      type: [Object, Array],
+      type: Array,
+      required: true,
     },
   },
   data() {
-    return { dictOptions: [], formItemLabel: '' ,selectVal:[]}
+    return { isInited: false, dictOptions: [], formItemLabel: '', selectVal: [], selectAllValues: [] }
   },
   created() {
-    this.initDictData(this.enumCode)
+    this.initSelectOptions()
   },
   methods: {
-    initDictData(code) {
-      var params = { code }
+    initSelectOptions() {
+      var params = { code: this.enumCode }
       GetEnumItems(params).then((res) => {
         if (res.code === 0) {
           this.dictOptions = res.data.dict
           this.formItemLabel = res.data.name
+          this.isInited = true
+          this.selectAllValues = res.data.dict.map((r) => r.code)
         }
       })
     },
@@ -55,12 +54,17 @@ export default {
     getAllValue() {
       return this.dictOptions.map((r) => r.code)
     },
-    // setCurrentDictOptions(dictOptions) {
-    //   this.dictOptions = dictOptions
-    // },
-    // getCurrentDictOptions() {
-    //   return this.dictOptions
-    // },
+
+    // 无关展示功能与实际选中项目 确保获取到options的值集合
+    getSelectAllValues() {
+      if (this.isInited) {
+        return Promise.resolve(this.selectAllValues.length > 0 ? this.selectAllValues : null)
+      } else {
+        return this.initSelectOptions().then((res) => {
+          return this.selectAllValues.length > 0 ? this.selectAllValues : null
+        })
+      }
+    },
     filterOption(input, option) {
       return option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
     },
@@ -72,8 +76,7 @@ export default {
         placeholder={this.placeholder}
         disabled={this.disabled}
         mode={'multiple'}
-        style="width200px;"
-        value={this.selectVal}
+        style="width:200px;"
         onchange={this.handleChange}
         maxTagCount={1}
         showSearch

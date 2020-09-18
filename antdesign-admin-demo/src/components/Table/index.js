@@ -1,57 +1,63 @@
 import T from 'ant-design-vue/es/table/Table'
 import get from 'lodash.get'
+import { form2param, filterEmptyVal } from '@/utils/util'
+
+// 使用说明
+
+// dataHandles: {
+//   listApi: getChangeRecordList, // table 数据来源api
+//   form: formVm,
+//   handleRequest: (req) => {return req },
+//   handleResponse: (res) => { return res},
+//   initialParams: {},
+// },
+
+// listApi 返回格式
+// {
+//   "data": [],
+//   "page": {
+//       "currentPage": 1,
+//       "resultCount": 17
+//   }
+// }
 
 export default {
   data() {
     return {
       needTotalList: [],
-
       selectedRows: [],
       selectedRowKeys: [],
-
       localLoading: false,
       localDataSource: [],
-      localPagination: Object.assign({}, this.pagination)
+      localPagination: Object.assign({
+        showTotal: (total) => `共 ${total} 条`
+      }, this.pagination)
     }
   },
   props: Object.assign({}, T.props, {
+    bordered: {
+      default: true
+    },
     rowKey: {
       type: [String, Function],
       default: 'key'
     },
-    // data: {
-    //   type: Function,
-    //   required: true
-    // },
-    // table 数据来源api
     dataHandles: {
       type: Object,
-      required: true
-    },
-    /****
-     * table 数据来源api
-     * {
-          "code": 0,
-          "msg": "成功！",
-          "data": [],
-          "page": {
-              "pageCount": 1,
-              "currentPage": 1,
-              "resultCount": 17,
-              "pageSize": 50,
-              "pageList": [ 10, 30,50, 100 ],
-              "changePageNumber": 0,
-              "startRowNum": 0,
-              "endRowNum": 50,
-              "isLastPage": true,
-              "isFirstPage": true
-          }
+      required: true,
+      validator: function (value) {
+        //   if (Object.prototype.toString.call(value.listApi) !== '[object Promise]') {
+        //     console.error('s-table.props.dataHandles.listApi is\'t Promise!')
+        //     return false
+        //   }
+        // form 非必选 但是有格式要求
+        if (value.form && !value.form.getFieldsValue) {
+          console.error('s-table.props.dataHandles.form is\'t decorator Object!')
+          return false
+        }
+        return true
       }
-     * 
-     * 
-     */
-
-
+    },
     pageNum: {
       type: Number,
       default: 1
@@ -149,9 +155,7 @@ export default {
       }))
       this.loadData()
     },
-   
-
-    loadData(pagination, filters, sorter) {
+    async loadData(pagination, filters, sorter) {
       this.localLoading = true
       const parameter = Object.assign({
         page: (pagination && pagination.current) ||
@@ -170,14 +174,15 @@ export default {
         this.dataHandles.initialParams || {},
         this.getSearchFormValues() // 获取form参数
       )
-
       // 请求前执行 handleRequest
-      this.dataHandles.handleRequest && this.dataHandles.handleRequest(parameter)
+      let newParameter = this.dataHandles.handleRequest ? await this.dataHandles.handleRequest(parameter) : parameter
+      // 去除 '' undefined null []
+      newParameter = filterEmptyVal(newParameter)
+
       // 调用接口
-      this.dataHandles.listApi(parameter)
+      this.dataHandles.listApi(newParameter)
         .then(r => {
           this.dataHandles.handleResponse && this.dataHandles.handleResponse(r)
-
           this.localPagination = this.showPagination && Object.assign({}, this.localPagination, {
             current: r.page.currentPage, // 返回结果中的当前分页数
             total: r.page.resultCount, // 返回结果中的总记录数
@@ -211,23 +216,9 @@ export default {
      * 如需要触发验证效果 请在handleRequest 中触发
      */
     getSearchFormValues() {
-      const seqrchParams = {}
-      if (this.dataHandles.form && this.dataHandles.form.getFieldsValue) {
-        const formValues = this.dataHandles.form.getFieldsValue()
-        // 目前只考虑 monment monment数组的转换
-        for (const k in formValues) {
-          const item = formValues[k]
-          const itemType = Object.prototype.toString.call(item)
-          if (item && item._isAMomentObject === true) {
-            seqrchParams[k] = item.format('YYYY-MM-DD')
-          } else if (itemType === '[object Array]' && item[0] && item[0]._isAMomentObject === true) {
-            const dateRangeNames = k.split('-')
-            seqrchParams[dateRangeNames[0]] = item[0].format('YYYY-MM-DD')
-            seqrchParams[dateRangeNames[1]] = item[1].format('YYYY-MM-DD')
-          } else {
-            seqrchParams[k] = item
-          }
-        }
+      let seqrchParams = {}
+      if (this.dataHandles.form) {
+        seqrchParams = form2param(this.dataHandles.form.getFieldsValue())
       }
       return seqrchParams
     },

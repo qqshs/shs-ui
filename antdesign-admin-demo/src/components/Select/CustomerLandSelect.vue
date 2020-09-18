@@ -1,97 +1,88 @@
 <script>
-  import { GetEnumItems } from '@/api/common'
+import { customerLandSelect } from '@/api/bytterAjax'
+import { initDefaultProps } from '@/utils/util'
+import S from 'ant-design-vue/es/select'
+import FT from 'ant-design-vue/es/form/FormItem'
 
-  // 使用方法
-  // 无须引入
-  // <a-form-item label="Note2">
-  //         <enum-select
-  //           enumCode="enumCodeXXX"
-  //           ref="enumCode"
-  //           v-decorator="['z3', { rules: [{ required: true, message: 'Please input your z3!' }] , initialValue : []}]"
-  //         ></enum-select>
-  //       </a-form-item>
-
-  export default {
-    name: 'EnumSelect',
-    props: {
-      enumCode: {
-        type: String,
-        required: true,
-      },
-      placeholder: {
-        type: String,
-        default: '请选择',
-      },
-      triggerChange: Boolean,
-      disabled: Boolean,
-      value: {
-        type: [Array, undefined, String],
-      },
+// 用法
+// <CustomerLandSelect
+//       ref="refCustomerLandSelect"
+//       :localStyle="{width:'200px'}"
+//       :localDecorator="['landIds', { rules: [{ required: false, message: 'required 类型!' }] }]"
+//     ></CustomerLandSelect>
+export default {
+  name: 'CustomerLandSelect',
+  props: Object.assign({}, FT.props, S.props, {
+    localDecorator: {
+      type: Array,
+      required: true,
     },
-    data() {
-      return { dictOptions: [], formItemLabel: '' }
+    label: {
+      default: '落地公司',
     },
-    created() {
-      this.initDictData(this.enumCode)
+    localStyle: {
+      type: Object,
     },
-    methods: {
-      initDictData(code) {
-        var params = { code }
-        GetEnumItems(params).then((res) => {
+    mode: {
+      default: 'multiple',
+    },
+    allowClear: {
+      default: true,
+    },
+    customerIds: {
+      type: Array,
+      default: () => [],
+    },
+  }),
+  data() {
+    return {
+      selectOptions: [],
+      selectAllValues: [],
+    }
+  },
+  methods: {
+    initSelectOptions: function (customerIds) {
+      if (customerIds && customerIds.length > 0) {
+        customerLandSelect({ customerIds: customerIds }).then((res) => {
           if (res.code === 0) {
-            this.dictOptions = res.data.dict
-            this.formItemLabel = res.data.name
+            this.selectOptions = res.data
+            this.selectAllValues = res.data.map((item) => item.code)
+          } else {
+            this.$message.error(res.msg || '请求错误！')
           }
         })
-      },
-      handleChange(e) {
-        this.$emit('change', e)
-        this.$emit('input', e)
-      },
-      getAllValue() {
-        return this.dictOptions.map((r) => r.code)
-      },
-      // setCurrentDictOptions(dictOptions) {
-      //   this.dictOptions = dictOptions
-      // },
-      // getCurrentDictOptions() {
-      //   return this.dictOptions
-      // },
-      filterOption(input, option) {
-        return option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
-      },
+      } else {
+        this.selectOptions = []
+      }
     },
-    render(h) {
-      console.log(this.formItemLabel)
-      const selectNode = (
+    getSelectAllValues() {
+      return this.selectAllValues.length > 0 ? this.selectAllValues : null
+    },
+  },
+  render() {
+    const selectProps = initDefaultProps(Object.keys(S.props), this)
+    const formItemProps = initDefaultProps(Object.keys(FT.props), this)
+    return (
+      <a-form-item {...{ props: formItemProps }}>
         <a-select
-      placeholder={this.placeholder}
-      disabled={this.disabled}
-      mode={'multiple'}
-      style="width200px;"
-      value={this.value}
-      onchange={this.handleChange}
-      maxTagCount={1}
-      showSearch
-      filterOption={this.filterOption}
-      optionFilterProp="children"
-      allowClear
-      // vDecorator={ this.decorator }
-      >
-      {this.dictOptions.map((item) => (
-          <a-select-option key={item.code} value={item.code}>
-        {item.name}
-        </a-select-option>
-    ))}
-    </a-select>
+          {...{ props: selectProps }}
+          style={this.localStyle}
+          v-decorator={this.localDecorator}
+          onchange={this.handleChange}
+          showSearch
+          maxTagCount={1}
+        >
+          {this.selectOptions.map((opt) => (
+            <a-select-option key={opt.code} value={opt.code}>
+              {opt.value}
+            </a-select-option>
+          ))}
+        </a-select>
+      </a-form-item>
     )
-
-      return selectNode
-      // return h('AFormItem', { props: { ...formItemLayout, label: this.formItemLabel } }, [selectNode])
-    },
-  }
-
+  },
+}
 </script>
 
-<style scoped>
+<style>
 </style>

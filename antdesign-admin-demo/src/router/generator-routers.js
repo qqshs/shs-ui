@@ -100,7 +100,7 @@ export const generatorDynamicRouter = () => {
 
       rootRouter.children = routers
       // rootRouter.children.push(notFoundRouter)
-      rootRouter.children.push(...tempAsyncRouterMap)
+      // rootRouter.children.push(...tempAsyncRouterMap)
       resolve([rootRouter])
     }).catch(err => {
       reject(err)
@@ -179,7 +179,7 @@ const initNavResult = (navTree) => {
     children = children && children.length > 0 ? initNavResult(children) : null
     hidden = hidden === '1' ? true : false
     return {
-      id, key: id, pid, path: url, component, name, redirect, hidden, sortNo: sortNo || 0, hideChildrenInMenu: false, meta: { title, show, hideChildren, target, icon }, children
+      id, key: id, pid, path: url, component, name, redirect, hidden, sortNo: sortNo || 0, hideChildrenInMenu: false, meta: { title, show, hideChildren, target, icon, id }, children
     }
   })
 }
