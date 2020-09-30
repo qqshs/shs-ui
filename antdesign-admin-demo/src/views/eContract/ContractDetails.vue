@@ -2,7 +2,7 @@
   <page-header-wrapper :title="false">
     <a-card :bordered="false" title="签约详情">
       <div class="table-page-search-wrapper">
-        <a-form :form="form" layout="inline">
+        <a-form :form="form" layout="inline" class="bytter-search-lable">
           <a-row :gutter="48">
             <a-col :md="8" :sm="24">
               <a-form-item label="交易日期">
@@ -11,23 +11,24 @@
             </a-col>
             <a-col :md="8" :sm="24">
               <a-form-item label="用户名">
-                <a-input v-decorator="['name']"></a-input>
+                <a-input v-decorator="['name']" class="input"></a-input>
               </a-form-item>
             </a-col>
-            <a-col :md="8" :sm="24">
-              <a-form-item label="身份证号">
-                <a-input v-decorator="['pinNo']"></a-input>
-              </a-form-item>
-            </a-col>
-            <template v-if="advanced">
+            <div v-show="advanced">
+              <a-col :md="8" :sm="24">
+                <a-form-item label="身份证号">
+                  <a-input v-decorator="['pinNo']" class="input"></a-input>
+                </a-form-item>
+              </a-col>
+           <!-- <template v-if="advanced">-->
               <a-col :md="8" :sm="24">
                 <a-form-item label="批次号">
-                  <a-input v-decorator="['batchNo']"></a-input>
+                  <a-input v-decorator="['batchNo']" class="input"></a-input>
                 </a-form-item>
               </a-col>
               <a-col :md="8" :sm="24">
                 <CustomerSelect
-                  :localStyle="{width:'200px'}"
+                  ref="CustomerSelect"
                   :localDecorator="['customerIds', { rules: [{ required: false, message: 'required 类型!' }] }]"
                   @change="initLandSelect"
                 ></CustomerSelect>
@@ -35,25 +36,24 @@
               <a-col :md="8" :sm="24">
                <CustomerLandSelect
                   ref="refCustomerLandSelect"
-                  :localStyle="{width:'200px'}"
                   :localDecorator="['landIds', { rules: [{ required: false, message: 'required 类型!' }] }]"
                 ></CustomerLandSelect>
               </a-col>
               <a-col :md="8" :sm="24">
                 <enum-select
-                  enumCode="agreement"
+                  enumCode="signAllState"
                   ref="enumCode"
-                  :decorator="['agreementStatuss', { rules: []}]"
+                  :decorator="['agreementStatus', { rules: []}]"
                 ></enum-select>
               </a-col>
-            </template>
+            </div>
             <a-col :md="!advanced && 8 || 24" :sm="24">
               <span
                 class="table-page-search-submitButtons"
                 :style="advanced && { float: 'right', overflow: 'hidden' } || {} "
               >
                 <a-button type="primary" @click="$refs.table.refresh()">查询</a-button>
-                <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">重置</a-button>
+                <a-button style="margin-left: 8px" @click="form.resetFields()">重置</a-button>
                 <a @click="toggleAdvanced" style="margin-left: 8px">
                   {{ advanced ? '收起' : '展开' }}
                   <a-icon :type="advanced ? 'up' : 'down'" />
@@ -78,7 +78,7 @@
           :columns="columns"
           :dataHandles="dataHandles"
           showPagination="auto"
-          :scroll="{ x: 2600 }"
+          :scroll="{ x: 2400 }"
         ></s-table>
       </div>
     </a-card>
@@ -95,52 +95,54 @@ import CreateForm from '@/views/list/modules/CreateForm'
 
 const columns = [
   {
-    title: '签约编号',
-    dataIndex: 'customerUserId',
-    align: 'center',
-    width: 300
-  },
-  {
-    title: '批次号',
-    dataIndex: 'userBatchNo',
-    align: 'center',
-    width: 300
-  },
-  {
     title: '签约人姓名',
     dataIndex: 'userName',
     align: 'center',
-    width:180
+    width:120
   },
   {
     title: '签约人身份证号',
     dataIndex: 'userPinNo',
     align: 'center',
-    width:180
+    width:160
   },
   {
     title: '签约人手机号',
     dataIndex: 'userPhoneNo',
     align: 'center',
-    width:180
+    width:160
   },
   {
     title: '商户名称',
     dataIndex: 'customerName',
     align: 'center',
-    width:300
+    ellipsis: true,
+    width:240
   },
   {
     title: '落地公司',
     dataIndex: 'landName',
     align: 'center',
-    width:300
+    ellipsis: true,
+    width:240
   },
   {
     title: '签约状态',
     dataIndex: 'agreementStatus',
     align: 'center',
     width:180
+  },
+   {
+    title: '签约编号',
+    dataIndex: 'customerUserId',
+    align: 'center',
+    width: 260
+  },
+  {
+    title: '批次号',
+    dataIndex: 'userBatchNo',
+    align: 'center',
+     width:260
   },
    {
     title: '导入时间',
@@ -156,25 +158,6 @@ const columns = [
   //   scopedSlots: { customRender: 'action' }
   // }
 ]
-
-const statusMap = {
-  0: {
-    status: 'default',
-    text: '关闭',
-  },
-  1: {
-    status: 'processing',
-    text: '运行中',
-  },
-  2: {
-    status: 'success',
-    text: '已上线',
-  },
-  3: {
-    status: 'error',
-    text: '异常',
-  },
-}
 
 export default {
   components: {
@@ -192,6 +175,20 @@ export default {
       dataHandles: {
         listApi: customerUserList,
         form: formVm,
+        handleRequest: async (req) => {
+          if (!req.customerIds || req.customerIds.length === 0) {
+            req.customerIds = await this.$refs.CustomerSelect.getSelectAllValues()
+          }
+          if (!req.landIds || req.landIds.length === 0) {
+            req.landIds = await this.$refs.refCustomerLandSelect.getSelectAllValues()
+          }
+          if (!req.signAllState || req.signAllState.length === 0) {
+            req.signAllState = await this.$refs.enumCode.getSelectAllValues()
+          }
+          return req
+        },
+        handleResponse: (res) => {
+        },
         initialParams: {},
       },
       columns,
@@ -206,14 +203,6 @@ export default {
       selectedRows: [],
     }
   },
-  filters: {
-    statusFilter(type) {
-      return statusMap[type].text
-    },
-    statusTypeFilter(type) {
-      return statusMap[type].status
-    },
-  },
   computed: {
     rowSelection() {
       return {
@@ -223,64 +212,6 @@ export default {
     },
   },
   methods: {
-    handleAdd() {
-      this.mdl = null
-      this.visible = true
-    },
-    handleEdit(record) {
-      this.visible = true
-      this.mdl = { ...record }
-    },
-    handleOk() {
-      const form = this.$refs.createModal.form
-      this.confirmLoading = true
-      form.validateFields((errors, values) => {
-        if (!errors) {
-          console.log('values', values)
-          if (values.id > 0) {
-            // 修改 e.g.
-            new Promise((resolve, reject) => {
-              setTimeout(() => {
-                resolve()
-              }, 1000)
-            }).then((res) => {
-              this.visible = false
-              this.confirmLoading = false
-              // 重置表单数据
-              form.resetFields()
-              // 刷新表格
-              this.$refs.table.refresh()
-
-              this.$message.info('修改成功')
-            })
-          } else {
-            // 新增
-            new Promise((resolve, reject) => {
-              setTimeout(() => {
-                resolve()
-              }, 1000)
-            }).then((res) => {
-              this.visible = false
-              this.confirmLoading = false
-              // 重置表单数据
-              form.resetFields()
-              // 刷新表格
-              this.$refs.table.refresh()
-
-              this.$message.info('新增成功')
-            })
-          }
-        } else {
-          this.confirmLoading = false
-        }
-      })
-    },
-    handleCancel() {
-      this.visible = false
-
-      const form = this.$refs.createModal.form
-      form.resetFields() // 清理表单数据（可不做）
-    },
     onSelectChange(selectedRowKeys, selectedRows) {
       this.selectedRowKeys = selectedRowKeys
       this.selectedRows = selectedRows
@@ -293,14 +224,12 @@ export default {
         date: moment(new Date()),
       }
     },
-     initLandSelect(v) {
+    initLandSelect(v) {
         this.$refs.refCustomerLandSelect.initSelectOptions(v instanceof Array ? v : [v])
         this.form.resetFields(['landIds'])
-      },
-      exports() {
-      return this.selectedRows.length === 0
-        ? this.dataHandles.listApi
-        : () => Promise.resolve({ data: this.selectedRows, code: 0 })
+    },
+    exports() {
+        return this.selectedRows.length === 0 ? this.dataHandles.listApi : () => Promise.resolve({ data: this.selectedRows, code: 0 })
     },
   },
 }

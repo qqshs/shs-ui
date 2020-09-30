@@ -10,7 +10,8 @@ export default {
       type: Array,
     },
     localStyle: {
-      type: Object,
+      type: [Object,Array],
+      // default: ()=> new Object({width:'333px'})
     },
     // prop 覆写
     label: {

@@ -2,6 +2,7 @@ import request from '@/utils/request'
 
 const customerApi = {
   addCustomer: request.bytterRouter.bytterEdmPay + '/bytterEdmPay/customer/add',
+  getAllLand: request.bytterRouter.bytterEdmPay + '/bytterEdmPay/customer/getAllLand',
   updateCustomerBank: request.bytterRouter.bytterEdmPay + '/bytterEdmPay/customer/update/bank',
   updateCustomerAdmin: request.bytterRouter.bytterEdmPay + '/bytterEdmPay/customer/update/admin',
   getCustomerDetail: request.bytterRouter.bytterEdmPay + '/bytterEdmPay/customer/detail',
@@ -9,6 +10,14 @@ const customerApi = {
   getChangeRecord: request.bytterRouter.bytterEdmPay + '/bytterEdmPay/change/getChangeRecord',
   getChangeRecordList: request.bytterRouter.bytterEdmPay + '/bytterEdmPay/change/getChangeRecordList',
   getPayFlowRecordList: request.bytterRouter.bytterEdmPay + '/bytterEdmPay/payFlow/getPayFlowRecordList',
+}
+
+export function getAllLand (parameter) {
+  return request({
+    url: customerApi.getAllLand,
+    method: 'post',
+    data: parameter
+  })
 }
 
 export function updateCustomerBank (parameter) {

@@ -2,7 +2,7 @@
   <page-header-wrapper :title="false">
     <a-card :bordered="false" title="充值对账单">
       <div class="table-page-search-wrapper">
-         <a-form :form="form" layout="inline">
+         <a-form :form="form" layout="inline" class="bytter-search-lable">
           <a-row :gutter="48">
             <a-col :md="8" :sm="24">
               <a-form-item label="交易日期">
@@ -11,23 +11,23 @@
             </a-col>
              <a-col :md="8" :sm="24">
                 <a-form-item label="充值单号">
-                    <a-input v-decorator="['id']"></a-input>
+                    <a-input v-decorator="['id']" class="input"></a-input>
                 </a-form-item>
             </a-col>
-             <a-col :md="8" :sm="24">
+            <div v-show="advanced">
+                <a-col :md="8" :sm="24">
                 <a-form-item label="付款账号">
-                    <a-input v-decorator="['payerAcc']"></a-input>
+                    <a-input v-decorator="['payerAcc']" class="input"></a-input>
                 </a-form-item>
             </a-col>
-            <template v-if="advanced">
                <a-col :md="8" :sm="24">
                 <a-form-item label="收款账号">
-                    <a-input v-decorator="['payeeAcc']"></a-input>
+                    <a-input v-decorator="['payeeAcc']" class="input"></a-input>
                 </a-form-item>
             </a-col>
               <a-col :md="8" :sm="24">
                 <CustomerSelect
-                  :localStyle="{width:'200px'}"
+                  ref="CustomerSelect"
                   :localDecorator="['customerIds', { rules: [{ required: false, message: 'required 类型!' }] }]"
                   @change="initLandSelect"
                 ></CustomerSelect>
@@ -35,18 +35,17 @@
               <a-col :md="8" :sm="24">
                 <CustomerLandSelect
                   ref="refCustomerLandSelect"
-                  :localStyle="{width:'200px'}"
                   :localDecorator="['landIds', { rules: [{ required: false, message: 'required 类型!' }] }]"
                 ></CustomerLandSelect>
               </a-col>
-            </template>
+            </div>
             <a-col :md="!advanced && 8 || 24" :sm="24">
               <span
                 class="table-page-search-submitButtons"
                 :style="advanced && { float: 'right', overflow: 'hidden' } || {} "
               >
                 <a-button type="primary" @click="$refs.table.refresh(true)">查询</a-button>
-                <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">重置</a-button>
+                <a-button style="margin-left: 8px" @click="form.resetFields()">重置</a-button>
                 <a @click="toggleAdvanced" style="margin-left: 8px">
                   {{ advanced ? '收起' : '展开' }}
                   <a-icon :type="advanced ? 'up' : 'down'" />
@@ -85,6 +84,7 @@ import { rechargeOrderList } from '@/api/statement'
 import StepByStepModal from '@/views/list/modules/StepByStepModal'
 import CreateForm from '@/views/list/modules/CreateForm'
 import CustomerSelect from '@/components/Select/CustomerSelect' // 自定义 枚举下拉
+import { number_format } from '@/utils/number'
 
 const columns = [
   {
@@ -103,6 +103,7 @@ const columns = [
     title: '商户名称',
     dataIndex: 'customerName',
     align: 'center',
+    ellipsis: true,
     width: 300
   },
   {
@@ -115,6 +116,7 @@ const columns = [
     title: '落地公司',
     dataIndex: 'landName',
     align: 'center',
+    ellipsis: true,
     width: 300
   },
   {
@@ -126,8 +128,11 @@ const columns = [
   {
     title: '充值金额',
     dataIndex: 'money',
-     align: 'right',
-     width: 180
+    width: 180,
+    align:'right',
+    customRender: (text, row, index) => {
+      return number_format(text)
+    },
   },
   {
     title: '交易时间',
@@ -146,6 +151,7 @@ const columns = [
 
 export default {
   components: {
+    number_format,
     Ellipsis,
     CreateForm,
     StepByStepModal,
@@ -159,7 +165,18 @@ export default {
       dataHandles: {
         listApi: rechargeOrderList,
         form: formVm,
+        handleRequest: async (req) => {
+          if (!req.customerIds || req.customerIds.length === 0) {
+            req.customerIds = await this.$refs.CustomerSelect.getSelectAllValues()
+          }
 
+          if (!req.landIds || req.landIds.length === 0) {
+            req.landIds = await this.$refs.refCustomerLandSelect.getSelectAllValues()
+          }
+           return req
+        },
+          handleResponse: (res) => {
+        },
         initialParams: {},
       },
       columns,
@@ -185,64 +202,6 @@ export default {
     }
   },
   methods: {
-    handleAdd() {
-      this.mdl = null
-      this.visible = true
-    },
-    handleEdit(record) {
-      this.visible = true
-      this.mdl = { ...record }
-    },
-    handleOk() {
-      const form = this.$refs.createModal.form
-      this.confirmLoading = true
-      form.validateFields((errors, values) => {
-        if (!errors) {
-          console.log('values', values)
-          if (values.id > 0) {
-            // 修改 e.g.
-            new Promise((resolve, reject) => {
-              setTimeout(() => {
-                resolve()
-              }, 1000)
-            }).then((res) => {
-              this.visible = false
-              this.confirmLoading = false
-              // 重置表单数据
-              form.resetFields()
-              // 刷新表格
-              this.$refs.table.refresh()
-
-              this.$message.info('修改成功')
-            })
-          } else {
-            // 新增
-            new Promise((resolve, reject) => {
-              setTimeout(() => {
-                resolve()
-              }, 1000)
-            }).then((res) => {
-              this.visible = false
-              this.confirmLoading = false
-              // 重置表单数据
-              form.resetFields()
-              // 刷新表格
-              this.$refs.table.refresh()
-
-              this.$message.info('新增成功')
-            })
-          }
-        } else {
-          this.confirmLoading = false
-        }
-      })
-    },
-    handleCancel() {
-      this.visible = false
-
-      const form = this.$refs.createModal.form
-      form.resetFields() // 清理表单数据（可不做）
-    },
     onSelectChange(selectedRowKeys, selectedRows) {
       this.selectedRowKeys = selectedRowKeys
       this.selectedRows = selectedRows
@@ -258,8 +217,8 @@ export default {
     initLandSelect(v) {
         this.$refs.refCustomerLandSelect.initSelectOptions(v instanceof Array ? v : [v])
         this.form.resetFields(['landIds'])
-      },
-       exports() {
+    },
+    exports() {
       return this.selectedRows.length === 0
         ? this.dataHandles.listApi
         : () => Promise.resolve({ data: this.selectedRows, code: 0 })

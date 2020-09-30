@@ -74,6 +74,9 @@ request.interceptors.request.use(config => {
 // response interceptor
 request.interceptors.response.use((response) => {
   const res = response.data
+  if (response.data.code === -1000) {
+    store.dispatch('Logout')
+  }
   if (res instanceof Blob) {
     return response
   }

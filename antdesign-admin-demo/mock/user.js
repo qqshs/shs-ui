@@ -27,6 +27,38 @@ export default [
       }
     }
   },
+  {
+    url: '/user/info',
+    type: 'post',
+    response: config => {
+      return {
+        code:20000,
+        data:{
+          roles:['测试权限1'],
+          name:'拜特科技',
+          avatar:''
+        }
+      }
+    }
+  },
+  {
+    url: '/table/list',
+    // type: 'post',
+    response: config => {
+      return {
+        code:20000,
+        data:{
+          items:[
+            {title:'111',Author:'aaa'},
+            {title:'111',Author:'aaa'},
+            {title:'111',Author:'aaa'},
+            {title:'111',Author:'aaa'},
+            {title:'111',Author:'aaa'},
+          ]
+        }
+      }
+    }
+  },
 
 ]
 

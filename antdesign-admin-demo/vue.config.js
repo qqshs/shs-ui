@@ -31,6 +31,9 @@ const assetsCDN = {
 
 // vue.config.js
 const vueConfig = {
+  // publicPath: './df',
+  // outputDir: 'dist',
+  // assetsDir: 'static',
   configureWebpack: {
     // webpack plugins
     plugins: [
@@ -63,6 +66,7 @@ const vueConfig = {
       .use('file-loader')
       .loader('file-loader')
       .options({
+        // name: 'static/assets/[name].[hash:8].[ext]'
         name: 'assets/[name].[hash:8].[ext]'
       })
 
@@ -97,15 +101,21 @@ const vueConfig = {
   },
   lintOnSave: false,
   devServer: {
-    host: 'localhost',
+    overlay: {
+      warnings: false,
+      errors: false
+    },
+    // host: 'localhost',
+    host: '192.168.2.135',
     // development server port 8000
     port: 8000,
     // If you want to turn on the proxy, please remove the mockjs /src/main.jsL11
     proxy: {
       '/api': {
-        // target: 'http://192.168.1.254:7000', // 后端服务 安新
-        // target: 'http://192.168.2.239:7000', // 后端服务 莫芳239
+        // target: 'http://192.168.1.168:7000', // 后端服务 安新
+        // target: 'http://192.168.1.254:7000', // 后端服务 莫芳239
         // target: 'http://192.168.1.193:7000', // 后端服务 园园
+        // target: 'http://192.168.0.72:7000', // 本地服务
         target: 'http://localhost:7000', // 本地服务
         ws: false,
         changeOrigin: true,
@@ -114,7 +124,7 @@ const vueConfig = {
         }
       },
       '/local': {
-        target: 'http://localhost:8000/mock', // 前端模拟服务
+        target: 'http://192.168.2.135:8000/mock', // 前端模拟服务
         ws: false,
         changeOrigin: true,
         pathRewrite: {

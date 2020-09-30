@@ -53,3 +53,12 @@ export function downloadTemplateByQuery(data) {
   })
 }
 
+export function demo(data) {
+
+  return request({
+    url: '/user/info',
+    method: 'post',
+    data: data
+  })
+}
+

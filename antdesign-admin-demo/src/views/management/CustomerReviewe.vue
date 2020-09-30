@@ -2,7 +2,7 @@
   <page-header-wrapper :title="false">
     <a-card :bordered="false" title="商户注册审核">
       <div class="table-page-search-wrapper">
-        <a-form :form="form" layout="inline">
+        <a-form :form="form" layout="inline" class="bytter-search-lable">
           <a-row :gutter="48">
             <a-col :md="8" :sm="24">
               <a-form-item label="注册日期">
@@ -52,7 +52,9 @@
           :columns="columns"
           :dataHandles="dataHandles"
           showPagination="auto"
-        >
+        ><span slot="statusMap" slot-scope="text">
+          <a-badge :status="text | statusTypeFilter" :text="text | statusFilter" />
+        </span>
           <span slot="action" slot-scope="text, record">
             <template>
               <a @click="review(record,'success')">通过</a> | <a @click="review(record,'fail')">拒绝</a>
@@ -123,15 +125,35 @@
     },
     {
       title: '审批状态',
-      dataIndex: 'statusName',
+      dataIndex: 'status',
+      scopedSlots: { customRender: 'statusMap' },
     },
     {
       title: '操作',
       dataIndex: 'action',
       width: 150,
-      scopedSlots: { customRender: 'action' }
+      scopedSlots: { customRender: 'action' },
+      fixed:'right',
     }
   ]
+  const statusMap = {
+    0: {
+      status: 'warning',
+      text: '待提交'
+    },
+    90: {
+      status: 'warning',
+      text: '待审核'
+    },
+    95: {
+      status: 'success',
+      text: '审核成功'
+    },
+    100: {
+      status: 'processing',
+      text: '审核失败'
+    }
+  }
   export default {
     components: {
       Ellipsis,
@@ -174,6 +196,14 @@
             this.$message.error(res.msg || '请求错误！')
           }
         })
+      }
+    },
+    filters: {
+      statusFilter (type) {
+        return statusMap[type].text
+      },
+      statusTypeFilter (type) {
+        return statusMap[type].status
       }
     },
   }

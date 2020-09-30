@@ -2,9 +2,9 @@
   <page-header-wrapper :title="false">
     <a-card :bordered="false" title="酬金发放查询">
       <div class="table-page-search-wrapper">
-        <a-form layout="inline" :form="form">
+        <a-form layout="inline" :form="form" class="bytter-search-lable">
           <a-row :gutter="48">
-            <a-col :md="8" :sm="24">
+            <a-col :md="8" :sm="24" >
               <a-form-item label="提交日期">
                 <a-range-picker v-decorator="['startDate-endDate']" />
               </a-form-item>
@@ -17,19 +17,18 @@
             <!-- <template v-if="advanced"> -->
             <a-col :md="8" :sm="24" v-show="advanced">
               <a-form-item label="姓名">
-                <a-input v-decorator="['payeeAccName']" class="input"></a-input>
+                <a-input v-decorator="['payeeAccName']" class="input bytter-search-input"></a-input>
               </a-form-item>
             </a-col>
 
             <a-col :md="8" :sm="24" v-show="advanced">
               <a-form-item label="收款账户">
-                <a-input v-decorator="['payeeAcc']" class="input"></a-input>
+                <a-input v-decorator="['payeeAcc']" class="input bytter-search-input"></a-input>
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24" v-show="advanced">
               <CustomerSelect
                 ref="CustomerSelect"
-                :localStyle="{width:'200px'}"
                 :localDecorator="['customerIds', { rules: [{ required: false, message: 'required 类型!' }] }]"
                 @change="initLandSelect"
               ></CustomerSelect>
@@ -37,12 +36,14 @@
             <a-col :md="8" :sm="24" v-show="advanced">
               <CustomerLandSelect
                 ref="refCustomerLandSelect"
-                :localStyle="{width:'200px'}"
                 :localDecorator="['landIds', { rules: [{ required: false, message: 'required 类型!' }] }]"
               ></CustomerLandSelect>
             </a-col>
             <a-col :md="8" :sm="24" v-show="advanced">
-              <enum-select enumCode="billFromType" ref="enumCode" :decorator="['billFromTypes']"></enum-select>
+              <enum-select enumCode="billFromType" ref="billFromTypeSelect" :decorator="['billFromTypes']"></enum-select>
+            </a-col>
+            <a-col :md="8" :sm="24" v-show="advanced">
+              <enum-select enumCode="signAllState" ref="refSignAllState" :decorator="['signStates']"></enum-select>
             </a-col>
             <!-- </template> -->
             <a-col :md="!advanced && 8 || 24" :sm="24">
@@ -83,9 +84,10 @@
           :showAlert="true"
           :rowSelection="rowSelection"
           showPagination="auto"
-          bordered
+          size="default"
+          :scroll="{ x: 2000 }"
         >
-          <span slot="serial" slot-scope="text, record, index">{{ index + 1 }}</span>
+          <!-- <span slot="serial" slot-scope="text, record, index">{{ index + 1 }}</span> -->
         </s-table>
       </div>
     </a-card>
@@ -97,6 +99,7 @@ import moment from 'moment'
 import { STable, Ellipsis, ExportExcel } from '@/components'
 import { commissionPayQuery } from '@/api/commissionPay'
 import { formatDateTime, getTagSelected } from '@/utils/util'
+import { number_format } from '@/utils/number'
 import CustomerSelect from '@/components/Select/CustomerSelect' // 自定义 枚举下拉
 import { GetEnumItems } from '@/api/bytterAjax'
 import { TagSelect, StandardFormRow, ArticleListContent } from '@/components'
@@ -104,8 +107,9 @@ const TagSelectOption = TagSelect.Option
 const scrolls = { x: true, y: true }
 const columns = [
   // {
-  //   title: '#',
+  //   // title: '#',
   //   scopedSlots: { customRender: 'serial' },
+  //   fixed: 'left'
   // },
   {
     title: '商户名称',
@@ -113,12 +117,12 @@ const columns = [
     align: 'center',
     ellipsis: true,
   },
-  {
+  /*{
     title: '交易状态',
     dataIndex: 'voucherStatName',
     align: 'center',
     ellipsis: true,
-  },
+  },*/
   {
     title: '落地名称',
     dataIndex: 'landName',
@@ -138,6 +142,12 @@ const columns = [
     ellipsis: true,
   },
   {
+    title: '签约状态',
+    dataIndex: 'signName',
+    align: 'center',
+    ellipsis: true,
+  },
+  {
     title: '收款人身份证',
     dataIndex: 'pinNo',
     align: 'center',
@@ -151,19 +161,16 @@ const columns = [
   },
   {
     title: '发放金额',
-    dataIndex: 'feeIn',
-    align: 'center',
+    dataIndex: 'fee',
+    align: 'right',
     ellipsis: true,
+    customRender: (text, row, index) => {
+      return number_format(text)
+    }
   },
   {
     title: '反馈结果',
     dataIndex: 'returnMsg',
-    align: 'center',
-    ellipsis: true,
-  },
-  {
-    title: '订单提交时间',
-    dataIndex: 'createTime',
     align: 'center',
     ellipsis: true,
   },
@@ -184,6 +191,13 @@ const columns = [
     dataIndex: 'remark',
     align: 'center',
     ellipsis: true,
+  },
+  {
+    title: '订单提交时间',
+    dataIndex: 'createTime',
+    align: 'center',
+    // ellipsis: true,
+    fixed:'right',
   },
 ]
 
@@ -239,9 +253,11 @@ export default {
           }
 
           if (!req.billFromTypes || req.billFromTypes.length === 0) {
-            req.billFromTypes = await this.$refs.enumCode.getSelectAllValues()
+            req.billFromTypes = await this.$refs.billFromTypeSelect.getSelectAllValues()
           }
-
+          if (!req.signStates || req.signStates.length === 0) {
+            //req.signStates = await this.$refs.refSignAllState.getSelectAllValues()
+          }
           return req
         },
         initialParams: {
@@ -318,9 +334,3 @@ export default {
   },
 }
 </script>
-
-<style >
-.input {
-  width: 300px;
-}
-</style>

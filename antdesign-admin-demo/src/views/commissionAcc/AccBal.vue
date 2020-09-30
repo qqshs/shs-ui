@@ -2,7 +2,7 @@
   <page-header-wrapper :title="false">
     <a-card :bordered="false" title="酬金账户充值查询">
       <div class="table-page-search-wrapper">
-        <a-form :form="form" layout="inline">
+        <a-form :form="form" layout="inline"  class="bytter-search-lable">
           <a-row :gutter="48">
             <a-col :md="8" :sm="24">
               <a-form-item label="充值日期">
@@ -11,19 +11,20 @@
             </a-col>
             <a-col :md="8" :sm="24">
               <enum-select
-                enumCode="voucherStat"
+                enumCode="balStatus"
                 ref="enumCode"
                 :decorator="['status', { rules: []}]"
               ></enum-select>
             </a-col>
-            <template v-if="advanced">
-              <a-col :md="8" :sm="24">
+<!--            <template v-if="advanced">-->
+              <a-col :md="8" :sm="24" v-show="advanced">
                 <CustomerSelect
+                  ref="CustomerSelect"
                   mode="multiple"
                   :localDecorator="['customerIds', { rules: [{ required: false, message: 'required 类型!' }] }]"
                 ></CustomerSelect>
               </a-col>
-            </template>
+<!--            </template>-->
             <a-col :md="!advanced && 8 || 24" :sm="24">
               <span
                 class="table-page-search-submitButtons"
@@ -64,6 +65,7 @@ import moment from 'moment'
 import { getChangeRecordList } from '@/api/customer'
 import { Ellipsis, ExportExcel } from '@/components'
 import CustomerSelect from '@/components/Select/CustomerSelect'
+import { number_format } from '@/utils/number'
 const columns = [
   {
     title: '商户名称',
@@ -84,6 +86,10 @@ const columns = [
   {
     title: '充值金额',
     dataIndex: 'money',
+    align:'right',
+    customRender: (text, row, index) => {
+      return number_format(text)
+    },
   },
   {
     title: '状态',
@@ -103,6 +109,7 @@ export default {
     Ellipsis,
     ExportExcel,
     CustomerSelect,
+    number_format,
   },
   name: 'AccBal',
   data() {
@@ -112,6 +119,12 @@ export default {
       dataHandles: {
         listApi: getChangeRecordList,
         form: formVm,
+        handleRequest: async (req) => {
+          if (!req.customerIds || req.customerIds.length === 0) {
+            req.customerIds = await this.$refs.CustomerSelect.getSelectAllValues()
+          }
+          return req
+        },
         initialParams: {},
       },
       columns,

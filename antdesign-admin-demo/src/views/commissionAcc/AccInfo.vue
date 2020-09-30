@@ -6,7 +6,7 @@
         <a-descriptions-item label="开户户名">{{ customer.bankAccName }}</a-descriptions-item>
         <a-descriptions-item label="银行账号">{{ customer.bankAcc }}</a-descriptions-item>
         <a-descriptions-item label="账户余额">
-          {{ customerBal.availBal }}
+          {{ number_format(customerBal.availBal) }}
           <a-tooltip placement="right">
             <template slot="title" >
               刷新余额
@@ -22,6 +22,7 @@
         rowKey="id"
         :data-source="data"
         :pagination="false"
+        bordered
       >
       </a-table>
     </a-card>
@@ -32,6 +33,7 @@
 <script>
   import { getCustomerDetail,getCustomerBal,getChangeRecord } from '@/api/customer'
   import ChangeCustomerModal from '../customer/module/ChangeCustomerModal'
+  import { number_format } from '@/utils/number'
 const columns = [
   {
     title: '商户名称',
@@ -52,6 +54,10 @@ const columns = [
   {
     title: '充值金额',
     dataIndex: 'money',
+    align:'right',
+    customRender: (text, row, index) => {
+      return number_format(text)
+    },
   },
   {
     title: '状态',
@@ -72,6 +78,7 @@ export default {
   name: 'AccInfo',
   components: {
     ChangeCustomerModal,
+    number_format,
   },
   data(){
     return{
@@ -86,6 +93,9 @@ export default {
   methods: {
     init(customerId){
       this.getCustomerDetail(customerId)
+    },
+    number_format(value){
+      return number_format(value)
     },
     changeCustomer(){
       this.$refs.ChangeCustomerModal.show({ title: '商户公司',

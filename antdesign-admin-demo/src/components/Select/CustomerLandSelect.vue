@@ -21,7 +21,8 @@ export default {
       default: '落地公司',
     },
     localStyle: {
-      type: Object,
+      type: [Object,Array],
+      // default: ()=> new Object({width:'333px'})
     },
     mode: {
       default: 'multiple',

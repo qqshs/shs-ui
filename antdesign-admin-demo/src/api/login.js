@@ -10,7 +10,16 @@ const userApi = {
   SendSmsErr: '/account/sms_err',
   // get my info
   UserInfo: '/user/info',
-  UserMenu: request.bytterRouter.businessBasic + '/businessBasic/menumanage/widget_menu'
+  UserMenu: request.bytterRouter.businessBasic + '/businessBasic/menumanage/widget_menu',
+  checkLogin:  request.bytterRouter.businessBasic + '/businessBasic/userLogin/checkLogin',
+}
+
+export function checkLogin (parameter) {
+  return request({
+    url: userApi.checkLogin,
+    method: 'post',
+    data: parameter
+  })
 }
 
 /**
@@ -25,7 +34,7 @@ const userApi = {
  * @returns {*}
  */
 export function login (parameter) {
-  
+
   return request({
     url: userApi.Login,
     method: 'post',

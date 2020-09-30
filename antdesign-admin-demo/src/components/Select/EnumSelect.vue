@@ -21,6 +21,10 @@ export default {
       type: String,
       default: '请选择',
     },
+    localStyle: {
+      type: [Object,Array],
+      // default: ()=> new Object({width:'333px'})
+    },
     triggerChange: Boolean,
     disabled: Boolean,
     decorator: {
@@ -76,7 +80,7 @@ export default {
         placeholder={this.placeholder}
         disabled={this.disabled}
         mode={'multiple'}
-        style="width:200px;"
+        style={this.localStyle}
         onchange={this.handleChange}
         maxTagCount={1}
         showSearch

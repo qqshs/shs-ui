@@ -155,6 +155,7 @@
 <script>
   import DownloadTemplate from '@/components/Button/DownloadTemplate'
   import ExportExcel from '@/components/Button/ExportExcel/ExportExcel'
+  import { number_format } from '@/utils/number'
 
   import { preImport,importFile } from '@/api/bytterAjax'
   import { commissionPayImport } from '@/api/commissionPay'
@@ -185,6 +186,9 @@ const columns = [
   {
     title: '发放金额',
     dataIndex: 'money',
+    /*customRender: (text, row, index) => {
+      return number_format(text)
+    }*/
   },
   {
     title: '备注',

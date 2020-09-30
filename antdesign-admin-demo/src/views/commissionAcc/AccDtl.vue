@@ -2,7 +2,7 @@
   <page-header-wrapper :title="false">
     <a-card :bordered="false" title="酬金账户发放流水查询">
       <div class="table-page-search-wrapper">
-        <a-form :form="form" layout="inline">
+        <a-form :form="form" layout="inline" class="bytter-search-lable">
           <a-row :gutter="48">
             <a-col :md="8" :sm="24">
               <a-form-item label="交易日期">
@@ -14,19 +14,20 @@
                 <a-input v-decorator="['payeeAccName']"></a-input>
               </a-form-item>
             </a-col>
-            <template v-if="advanced">
-              <a-col :md="8" :sm="24">
-                <a-form-item label="收方账号">
-                  <a-input v-decorator="['payerAcc']"></a-input>
-                </a-form-item>
-              </a-col>
-              <a-col :md="8" :sm="24">
-                <CustomerSelect
-                  mode="multiple"
-                  :localDecorator="['customerIds', { rules: [{ required: false, message: 'required 类型!' }] }]"
-                ></CustomerSelect>
-              </a-col>
-            </template>
+            <!--            <template v-if="advanced">-->
+            <a-col :md="8" :sm="24" v-show="advanced">
+              <a-form-item label="收方账号">
+                <a-input v-decorator="['payerAcc']"></a-input>
+              </a-form-item>
+            </a-col>
+            <a-col :md="8" :sm="24" v-show="advanced">
+              <CustomerSelect
+                ref="CustomerSelect"
+                mode="multiple"
+                :localDecorator="['customerIds', { rules: [{ required: false, message: 'required 类型!' }] }]"
+              ></CustomerSelect>
+            </a-col>
+            <!--            </template>-->
             <a-col :md="!advanced && 8 || 24" :sm="24">
               <span
                 class="table-page-search-submitButtons"
@@ -46,7 +47,7 @@
     </a-card>
 
     <a-card :bordered="false">
-      <div  class="table-operator">
+      <div class="table-operator">
         <tag-select @change="fliterTable" v-if="filterOptions.length>0" style="float:right;">
           <tag-select-option
             v-for="val in filterOptions"
@@ -75,39 +76,58 @@
   import CustomerSelect from '@/components/Select/CustomerSelect'
   import { getTagSelected } from '@/utils/util'
   import { GetEnumItems } from '@/api/bytterAjax'
+  import { number_format } from '@/utils/number'
   const columns = [
   {
     title: '商户名称',
     dataIndex: 'customerName',
+    ellipsis: true,
   },
   {
     title: '订单号',
     dataIndex: 'payId',
+    ellipsis: true,
   },
   {
     title: '落地公司',
     dataIndex: 'landName',
+    ellipsis: true,
   },
   {
     title: '收方户名',
     dataIndex: 'payeeAccName',
+    ellipsis: true,
   },
   {
     title: '收方账号',
     dataIndex: 'payerAcc',
+    ellipsis: true,
   },
   {
     title: '身份证号',
     dataIndex: 'pinNo',
+    ellipsis: true,
   },
   {
     title: '交易金额',
     dataIndex: 'fee',
+    align:'right',
+    width: 100,
+    customRender: (text, row, index) => {
+      return number_format(text)
+    },
   },
+    {
+      title: '返回信息',
+      dataIndex: 'returnMsg',
+      ellipsis: true,
+    },
   {
-    title: '日期',
+    title: '交易日期',
     dataIndex: 'returnTime',
-    align:'right'
+    align:'right',
+    ellipsis: true,
+
   },
 ]
   const TagSelectOption = TagSelect.Option
@@ -118,6 +138,7 @@ export default {
     CustomerSelect,
     TagSelect,
     TagSelectOption,
+    number_format,
   },
   name: 'AccDtl',
   data() {
@@ -127,7 +148,10 @@ export default {
       dataHandles: {
         listApi: getPayFlowRecordList,
         form: formVm,
-        handleRequest: (req) => {
+        handleRequest: async (req) => {
+          if (!req.customerIds || req.customerIds.length === 0) {
+            req.customerIds = await this.$refs.CustomerSelect.getSelectAllValues()
+          }
           return req
         },
         initialParams: {
@@ -144,7 +168,7 @@ export default {
   },
   mounted() {
     // this.loadAll() //模拟从后台获取数据后，显示数据，隐藏骨架屏
-    this.getFilterOptions()
+    // this.getFilterOptions()
   },
   methods: {
     refresh() {
@@ -161,13 +185,13 @@ export default {
       })
       this.$refs.table.refresh(true)
     },
-    getFilterOptions() {
-      GetEnumItems({ code: 'voucherStat' }).then((res) => {
-        if (res.code === 0) {
-          this.filterOptions = res.data.dict
-        }
-      })
-    },
+    // getFilterOptions() {
+    //   GetEnumItems({ code: 'voucherStat' }).then((res) => {
+    //     if (res.code === 0) {
+    //       this.filterOptions = res.data.dict
+    //     }
+    //   })
+    // },
   },
 }
 </script>

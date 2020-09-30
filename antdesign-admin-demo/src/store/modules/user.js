@@ -2,7 +2,6 @@ import storage from 'store'
 import { login, getInfo, logout } from '@/api/login'
 import { ACCESS_TOKEN } from '@/store/mutation-types'
 import { welcome } from '@/utils/util'
-
 const user = {
   state: {
     token: '',
@@ -10,7 +9,7 @@ const user = {
     welcome: '',
     avatar: '',
     roles: [],
-    info: {}
+    userInfo: {}
   },
 
   mutations: {
@@ -27,8 +26,8 @@ const user = {
     SET_ROLES: (state, roles) => {
       state.roles = roles
     },
-    SET_INFO: (state, info) => {
-      state.info = info
+    SET_USER_INFO: (state, userInfo) => {
+      state.userInfo = userInfo
     }
   },
 
@@ -36,15 +35,19 @@ const user = {
     // 登录
     Login({ commit }, userInfo) {
       return new Promise((resolve, reject) => {
-        
-        login(userInfo).then(response => {
-          
 
-          const token = response.data
-          storage.set(ACCESS_TOKEN, token, 7 * 24 * 60 * 60 * 1000)
-          commit('SET_TOKEN', token)
-        
-          resolve()
+        login(userInfo).then(res => {
+          if (res.code === 0) {
+            const token = res.data
+            storage.set(ACCESS_TOKEN, token, 7 * 24 * 60 * 60 * 1000)
+            commit('SET_TOKEN', token)
+
+            // 通过token 解析得到用户信息
+            // commit('SET_USER_INFO', getUserInfo())
+            resolve()
+          } else {
+            reject(res)
+          }
         }).catch(error => {
           reject(error)
         })
@@ -68,7 +71,7 @@ const user = {
             })
             role.permissionList = role.permissions.map(permission => { return permission.permissionId })
             commit('SET_ROLES', result.role)
-            commit('SET_INFO', result)
+            commit('SET_USER_INFO', result)
           } else {
             reject(new Error('getInfo: roles must be a non-null array !'))
           }

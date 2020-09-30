@@ -1,3 +1,7 @@
+import storage from 'store'
+import { ACCESS_TOKEN } from '@/store/mutation-types'
+import Base64 from 'js-base64'
+
 export function timeFix() {
   const time = new Date()
   const hour = time.getHours()
@@ -177,4 +181,14 @@ export function initDefaultProps(propKeys, vm) {
     }
   })
   return defProps
+}
+
+export function getUserInfo() {
+  const token = storage.get(ACCESS_TOKEN) || ''
+  const infoArr = token.split('.')
+  if (infoArr && infoArr.length > 1) {
+    const userInfoStr = Base64.Base64.decode(infoArr[1], 'utf-8')
+    return userInfoStr ? JSON.parse(userInfoStr) : {}
+  }
+  return {}
 }

@@ -50,13 +50,13 @@
     </a-card>
     <a-card style="margin-top: 24px" :bordered="false" title="平台账户详情">
       <a-descriptions title="平台账户余额">
-        <a-descriptions-item label="账户余额">{{ customerBal.availBal }}</a-descriptions-item>
-        <a-descriptions-item label="未付金额">{{ customerBal.frzBal }}</a-descriptions-item>
+        <a-descriptions-item label="账户余额">{{ number_format(customerBal.availBal) }}</a-descriptions-item>
+        <a-descriptions-item label="未付金额">{{ number_format(customerBal.frzBal) }}</a-descriptions-item>
         <a-descriptions-item label="最后充值日期">{{ transTime }}</a-descriptions-item>
       </a-descriptions>
       <a-divider style="margin-bottom: 32px" />
       <a-descriptions title="平台账户充值记录"></a-descriptions>
-      <a-table :columns="columns" rowKey="id" :data-source="data" :pagination="false"></a-table>
+      <a-table :columns="columns" rowKey="id" :data-source="data" :pagination="false" :bordered="true"></a-table>
     </a-card>
     <CustomerModalForm ref="CustomerModalForm" @ok="getCustomerDetail(customer.id)"></CustomerModalForm>
     <CustomerAdminModalForm ref="CustomerAdminModalForm" @ok="getCustomerDetail(customer.id)"></CustomerAdminModalForm>
@@ -69,6 +69,7 @@ import { getCustomerDetail, getCustomerBal, getChangeRecord } from '@/api/custom
 import CustomerModalForm from './module/CustomerModalForm'
 import CustomerAdminModalForm from './module/CustomerAdminModalForm'
 import ChangeCustomerModal from './module/ChangeCustomerModal'
+import { number_format } from '@/utils/number'
 const columns = [
   {
     title: '商户名称',
@@ -89,6 +90,10 @@ const columns = [
   {
     title: '充值金额',
     dataIndex: 'money',
+    align:'right',
+    customRender: (text, row, index) => {
+      return number_format(text)
+    },
   },
   {
     title: '状态',
@@ -110,6 +115,7 @@ export default {
     CustomerModalForm,
     CustomerAdminModalForm,
     ChangeCustomerModal,
+    number_format,
   },
   data() {
     return {
@@ -141,6 +147,9 @@ export default {
   methods: {
     init(customerId){
       this.getCustomerDetail(customerId)
+    },
+    number_format(value){
+      return number_format(value)
     },
     changeCustomer(){
       this.$refs.ChangeCustomerModal.show({ title: '商户公司',

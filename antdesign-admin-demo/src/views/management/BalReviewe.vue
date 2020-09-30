@@ -2,7 +2,7 @@
   <page-header-wrapper :title="false">
     <a-card :bordered="false" title="余额充值审核">
       <div class="table-page-search-wrapper">
-        <a-form :form="form" layout="inline">
+        <a-form :form="form" layout="inline" class="bytter-search-lable">
           <a-row :gutter="48">
             <a-col :md="8" :sm="24">
               <a-form-item label="交易日期">
@@ -11,7 +11,7 @@
             </a-col>
             <a-col :md="8" :sm="24">
               <enum-select
-                enumCode="voucherStat"
+                enumCode="status"
                 ref="enumCode"
                 :decorator="['status', { rules: []}]"
               ></enum-select>
@@ -48,10 +48,13 @@
           ref="table"
           size="default"
           rowKey="id"
+          :scroll="{ x: 2300 }"
           :columns="columns"
           :dataHandles="dataHandles"
           showPagination="auto"
-        >
+        ><span slot="statusMap" slot-scope="text">
+          <a-badge :status="text | statusTypeFilter" :text="text | statusFilter" />
+        </span>
           <span slot="action" slot-scope="text, record">
             <template>
               <a @click="review(record,'success')">通过</a> | <a @click="review(record,'fail')">拒绝</a>
@@ -68,6 +71,25 @@
   import { getBalDtl, reviewBalDtl } from '@/api/management'
   import { Ellipsis, ExportExcel } from '@/components'
   import CustomerSelect from '@/components/Select/CustomerSelect'
+  import { number_format } from '@/utils/number'
+  const statusMap = {
+    0: {
+      status: 'warning',
+      text: '待提交'
+    },
+    90: {
+      status: 'warning',
+      text: '待审核'
+    },
+    95: {
+      status: 'success',
+      text: '审核成功'
+    },
+    100: {
+      status: 'processing',
+      text: '审核失败'
+    }
+  }
   const columns = [
     {
       title: '流水号',
@@ -80,6 +102,9 @@
     {
       title: '付款银行',
       dataIndex: 'customerBankName',
+      customRender: (text, row, index) => {
+        return row.customerBankName || row.oppAccName
+      },
     },
     {
       title: '付款银行卡',
@@ -100,24 +125,38 @@
     {
       title: '充值金额',
       dataIndex: 'amt',
+      align:'right',
+      customRender: (text, row, index) => {
+        return number_format(text)
+      },
     },
     {
       title: '状态',
-      dataIndex: 'statusName',
+      dataIndex: 'status',
+      scopedSlots: { customRender: 'statusMap' },
     },
-    {
-      title: '创建时间',
-      dataIndex: 'createTime',
-    },
+    // {
+    //   title: '创建时间',
+    //   dataIndex: 'createTime',
+    // },
     {
       title: '交易时间',
       dataIndex: 'transTime',
     },
     {
+      title: '用途',
+      dataIndex: 'uses',
+    },
+    {
+      title: '备注',
+      dataIndex: 'remake',
+    },
+    {
       title: '操作',
       dataIndex: 'action',
       width: 150,
-      scopedSlots: { customRender: 'action' }
+      scopedSlots: { customRender: 'action' },
+      fixed:'right',
     }
   ]
   export default {
@@ -125,6 +164,7 @@
       Ellipsis,
       ExportExcel,
       CustomerSelect,
+      number_format,
     },
     name: 'BalReview',
     data() {
@@ -162,6 +202,14 @@
             this.$message.error(res.msg || '请求错误！')
           }
         })
+      }
+    },
+    filters: {
+      statusFilter (type) {
+        return statusMap[type].text
+      },
+      statusTypeFilter (type) {
+        return statusMap[type].status
       }
     },
   }

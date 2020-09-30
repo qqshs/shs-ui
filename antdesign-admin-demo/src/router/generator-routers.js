@@ -100,7 +100,7 @@ export const generatorDynamicRouter = () => {
 
       rootRouter.children = routers
       // rootRouter.children.push(notFoundRouter)
-      // rootRouter.children.push(...tempAsyncRouterMap)
+      rootRouter.children.push(...tempAsyncRouterMap)
       resolve([rootRouter])
     }).catch(err => {
       reject(err)

@@ -330,7 +330,44 @@ export default
         }
       ]
     },
-    // other      
+    {
+      path: '/userSetting',
+      component: RouteView,
+      redirect: '/userSetting',
+      name: 'userSetting',
+      meta: { title: '个人页', icon: 'user', keepAlive: true, permission: ['user'] },
+      children: [
+        {
+          path: '/userSetting/center',
+          name: 'userCenter',
+          component: () => import('@/views/account/center'),
+          meta: { title: '个人中心', keepAlive: true, permission: ['user'] }
+        },
+        {
+          path: '/user/setting',
+          name: 'userSettings',
+          component: () => import('@/views/userSetting/Index'),
+          meta: { title: '个人设置', hideHeader: true, permission: ['user'] },
+          redirect: '/user/setting/base',
+          hideChildrenInMenu: true,
+          children: [
+            {
+              path: '/user/setting/base',
+              name: 'userBaseSettings',
+              component: () => import('@/views/userSetting/UserBase'),
+              meta: { title: '基本设置', hidden: true, permission: ['user'] }
+            },
+            {
+              path: '/user/setting/security',
+              name: 'userSecuritySettings',
+              component: () => import('@/views/userSetting/UserSecurity'),
+              meta: { title: '安全设置', hidden: true, keepAlive: true, permission: ['user'] }
+            },
+          ]
+        }
+      ]
+    },
+    // other
     {
       path: '/other',
       name: 'otherPage',

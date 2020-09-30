@@ -7,7 +7,7 @@
     <a-card :bordered="false" title="用户导入">
       <a-steps class="steps" :current="currentTab">
         <a-step title="选择商户及落地信息" />
-        <a-step title="导入发放订单" />
+        <a-step title="导入用户信息" />
         <a-step title="确认及保存" />
         <a-step title="保存成功" />
       </a-steps>
@@ -40,10 +40,10 @@
           <a-divider />
           <div class="step-form-style-desc">
             <h3>说明</h3>
-            <h4>step1</h4>
-            <p>如果需要，这里可以放一些关于产品的常见问题说明。如果需要，这里可以放一些关于产品的常见问题说明。如果需要，这里可以放一些关于产品的常见问题说明。</p>
-            <h4>转账到银行卡</h4>
-            <p>如果需要，这里可以放一些关于产品的常见问题说明。如果需要，这里可以放一些关于产品的常见问题说明。如果需要，这里可以放一些关于产品的常见问题说明。</p>
+            <h4>商户及落地信息</h4>
+            <p>导入用户之前必须先选择商户及落地信息</p>
+            <h4>模板下载</h4>
+            <p>点击模板下载，下载用户导入的模板。请按照模板填写信息，所以信息为必填</p>
           </div>
         </div>
         <div v-show="currentTab === 1">
@@ -79,10 +79,8 @@
           <a-divider />
           <div class="step-form-style-desc">
             <h3>step2</h3>
-            <h4>转账到支付宝账户</h4>
-            <p>如果需要，这里可以放一些关于产品的常见问题说明。如果需要，这里可以放一些关于产品的常见问题说明。如果需要，这里可以放一些关于产品的常见问题说明。</p>
-            <h4>转账到银行卡</h4>
-            <p>如果需要，这里可以放一些关于产品的常见问题说明。如果需要，这里可以放一些关于产品的常见问题说明。如果需要，这里可以放一些关于产品的常见问题说明。</p>
+            <h4>文件上传</h4>
+            <p>文件请上传 xlsx 格式的文件，并且最大不要超过2000条</p>
           </div>
         </div>
         <div v-if="currentTab === 2">
@@ -122,28 +120,28 @@
           <a-row type="flex" justify="center" align="top">
             <a-button :loading="loading" type="primary" @click="ensureSave">提交</a-button>
             <a-button style="margin-left: 8px" @click="prevStep">上一步</a-button>
-            <a-button style="margin-left: 8px" @click="$refs.table.refresh()">测试 再次上传！</a-button>
+            <!-- <a-button style="margin-left: 8px" @click="$refs.table.refresh()">测试 再次上传！</a-button> -->
           </a-row>
 
           <a-divider />
           <div class="step-form-style-desc">
             <h3>说明</h3>
-            <h4>step3</h4>
-            <p>如果需要，这里可以放一些关于产品的常见问题说明。如果需要，这里可以放一些关于产品的常见问题说明。如果需要，这里可以放一些关于产品的常见问题说明。</p>
-            <h4>转账到银行卡</h4>
-            <p>如果需要，这里可以放一些关于产品的常见问题说明。如果需要，这里可以放一些关于产品的常见问题说明。如果需要，这里可以放一些关于产品的常见问题说明。</p>
+            <h4>提交</h4>
+            <p>点击提交会将成功的用户添加</p>
+            <h4>查询</h4>
+            <p>请前往签约详情查询签约成功的数据</p>
           </div>
         </div>
         <div v-show="currentTab === 3">
           <a-result
             status="success"
-            sub-title=" 本文字区域可以展示简单的补充说明，如果有类似展示 “单据”的需求，下面这个灰色区域可以呈现比较复杂的内容"
+            sub-title=" 用户信息提交成功，可以去签约详情里面查看记录"
             title="提交成功"
           >
-            <template #extra>
+            <!-- <template #extra>
               <a-button type="primary">查看列表</a-button>
               <a-button style="margin-left: 8px">重新导入</a-button>
-            </template>
+            </template> -->
           </a-result>
         </div>
       </div>
