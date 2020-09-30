@@ -1,0 +1,7 @@
+.table-page-search-wrapper .ant-form-inline .ant-form-item .ant-form-item-control {
+  max-width: 342px;
+}
+.table-page-search-wrapper .ant-form-inline .ant-form-item > .ant-form-item-label {
+  min-width: 80px;
+  display: block;
+}
